@@ -1,0 +1,4 @@
+# Secrets / local env (git root is the monorepo root)
+.env
+.env.local
+!.env.example
