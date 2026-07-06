@@ -30,7 +30,7 @@ public interface TaskService {
 
     // ----- ADMIN: all tasks -----
 
-    Page<TaskResponse> getAllTasks(String statusCode, Pageable pageable);
+    Page<TaskResponse> getAllTasks(String statusCode, Long ownerId, Pageable pageable);
 
     TaskResponse getAnyTask(Long taskId);
 

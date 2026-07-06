@@ -1,7 +1,10 @@
 package me.savindu.task_manager_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.time.Instant;
 
 /**
  * Payload to create a task. {@code status} is an optional status code (e.g.
@@ -18,6 +21,9 @@ public record CreateTaskRequest(
         String description,
 
         @Size(max = 50)
-        String status
+        String status,
+
+        @NotNull
+        Instant dueDate
 ) {
 }

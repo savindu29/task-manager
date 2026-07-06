@@ -12,6 +12,7 @@ public record TaskResponse(
         String title,
         String description,
         String status,
+        Instant dueDate,
         Long ownerId,
         String ownerName,
         Instant createdAt,

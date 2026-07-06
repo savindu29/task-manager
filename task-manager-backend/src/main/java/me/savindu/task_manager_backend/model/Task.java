@@ -18,6 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 /**
  * A task owned by exactly one {@link User}. Ownership drives authorization:
  * regular users may only touch tasks whose {@code owner} is themselves, while
@@ -50,6 +52,9 @@ public class Task extends BaseAuditEntity {
 
     @Column(length = 2000)
     private String description;
+
+    @Column(name = "due_date", nullable = false)
+    private Instant dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(

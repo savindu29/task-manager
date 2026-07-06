@@ -21,6 +21,7 @@ public class TaskMapper {
                 .title(request.title().trim())
                 .description(request.description())
                 .status(status)
+                .dueDate(request.dueDate())
                 .owner(owner)
                 .build();
     }
@@ -33,6 +34,7 @@ public class TaskMapper {
         task.setTitle(request.title().trim());
         task.setDescription(request.description());
         task.setStatus(status);
+        task.setDueDate(request.dueDate());
     }
 
     public TaskResponse toResponse(Task task) {
@@ -41,6 +43,7 @@ public class TaskMapper {
                 task.getTitle(),
                 task.getDescription(),
                 task.getStatus().getCode(),
+                task.getDueDate(),
                 task.getOwner().getId(),
                 task.getOwner().getName(),
                 task.getCreatedAt(),

@@ -5,40 +5,40 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
  * Owner-scoped finders enforce data isolation at the query level: a user's
- * endpoints only ever call the {@code ...OwnerId} variants, so one user can
- * never read or mutate another user's task even by guessing an id. Admin
- * endpoints use the unscoped finders. {@code @EntityGraph} eagerly loads the
- * owner and status to avoid N+1 selects when mapping to responses. Status
- * filtering traverses the reference table via the {@code status.code} path.
+ * endpoints only ever call {@code findByIdAndOwnerId} or pass their own id to
+ * {@link #search}, so one user can never read or mutate another user's task even
+ * by guessing an id. {@code @EntityGraph} eagerly loads the owner and status to
+ * avoid N+1 selects when mapping to responses.
  */
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    // ----- User-scoped (own tasks only) -----
-
+    /**
+     * Flexible, paginated listing with optional filters. A null {@code ownerId}
+     * means "all owners" (admin); a null {@code statusCode} means "any status".
+     * User endpoints always pass their own id, so the same query safely serves
+     * both roles.
+     */
     @EntityGraph(attributePaths = {"owner", "status"})
-    Page<Task> findByOwnerId(Long ownerId, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"owner", "status"})
-    Page<Task> findByOwnerIdAndStatus_Code(Long ownerId, String statusCode, Pageable pageable);
+    @Query("""
+            select t from Task t
+            where (:ownerId is null or t.owner.id = :ownerId)
+              and (:statusCode is null or t.status.code = :statusCode)
+            """)
+    Page<Task> search(@Param("ownerId") Long ownerId,
+                      @Param("statusCode") String statusCode,
+                      Pageable pageable);
 
     @EntityGraph(attributePaths = {"owner", "status"})
     Optional<Task> findByIdAndOwnerId(Long id, Long ownerId);
-
-    // ----- Admin (all tasks) -----
-
-    @Override
-    @EntityGraph(attributePaths = {"owner", "status"})
-    Page<Task> findAll(Pageable pageable);
-
-    @EntityGraph(attributePaths = {"owner", "status"})
-    Page<Task> findByStatus_Code(String statusCode, Pageable pageable);
 
     @EntityGraph(attributePaths = {"owner", "status"})
     Optional<Task> findWithOwnerById(Long id);

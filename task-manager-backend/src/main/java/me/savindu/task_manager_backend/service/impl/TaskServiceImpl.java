@@ -8,6 +8,8 @@ import me.savindu.task_manager_backend.dto.CreateTaskRequest;
 import me.savindu.task_manager_backend.dto.TaskResponse;
 import me.savindu.task_manager_backend.dto.UpdateTaskRequest;
 import me.savindu.task_manager_backend.mapper.TaskMapper;
+import me.savindu.task_manager_backend.messaging.TaskChangedEvent;
+import me.savindu.task_manager_backend.messaging.TaskEvent;
 import me.savindu.task_manager_backend.model.Task;
 import me.savindu.task_manager_backend.model.TaskStatus;
 import me.savindu.task_manager_backend.model.User;
@@ -15,6 +17,7 @@ import me.savindu.task_manager_backend.repository.TaskRepository;
 import me.savindu.task_manager_backend.repository.TaskStatusRepository;
 import me.savindu.task_manager_backend.repository.UserRepository;
 import me.savindu.task_manager_backend.service.TaskService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class TaskServiceImpl implements TaskService {
     private final UserRepository userRepository;
     private final TaskStatusRepository taskStatusRepository;
     private final TaskMapper taskMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ============================================================
     // USER - own tasks only
@@ -40,17 +44,18 @@ public class TaskServiceImpl implements TaskService {
         User owner = userRepository.getReferenceById(ownerId);
         TaskStatus status = resolveStatusOrDefault(request.status());
 
-        Task task = taskMapper.toEntity(request, owner, status);
-        return taskMapper.toResponse(taskRepository.save(task));
+        Task saved = taskRepository.save(taskMapper.toEntity(request, owner, status));
+        TaskResponse response = taskMapper.toResponse(saved);
+
+        publish(saved.getOwner().getId(), TaskEvent.created(response));
+        return response;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<TaskResponse> getOwnTasks(Long ownerId, String statusCode, Pageable pageable) {
-        Page<Task> tasks = StringUtils.hasText(statusCode)
-                ? taskRepository.findByOwnerIdAndStatus_Code(ownerId, statusCode, pageable)
-                : taskRepository.findByOwnerId(ownerId, pageable);
-        return tasks.map(taskMapper::toResponse);
+        return taskRepository.search(ownerId, normalize(statusCode), pageable)
+                .map(taskMapper::toResponse);
     }
 
     @Override
@@ -64,13 +69,20 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse updateOwnTask(Long ownerId, Long taskId, UpdateTaskRequest request) {
         Task task = requireOwnedTask(taskId, ownerId);
         taskMapper.applyUpdate(task, request, requireStatus(request.status()));
-        return taskMapper.toResponse(task);
+        TaskResponse response = taskMapper.toResponse(task);
+
+        publish(task.getOwner().getId(), TaskEvent.updated(response));
+        return response;
     }
 
     @Override
     @Transactional
     public void deleteOwnTask(Long ownerId, Long taskId) {
-        taskRepository.delete(requireOwnedTask(taskId, ownerId));
+        Task task = requireOwnedTask(taskId, ownerId);
+        Long taskOwnerId = task.getOwner().getId();
+        taskRepository.delete(task);
+
+        publish(taskOwnerId, TaskEvent.deleted(taskId));
     }
 
     // ============================================================
@@ -79,11 +91,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TaskResponse> getAllTasks(String statusCode, Pageable pageable) {
-        Page<Task> tasks = StringUtils.hasText(statusCode)
-                ? taskRepository.findByStatus_Code(statusCode, pageable)
-                : taskRepository.findAll(pageable);
-        return tasks.map(taskMapper::toResponse);
+    public Page<TaskResponse> getAllTasks(String statusCode, Long ownerId, Pageable pageable) {
+        return taskRepository.search(ownerId, normalize(statusCode), pageable)
+                .map(taskMapper::toResponse);
     }
 
     @Override
@@ -97,13 +107,20 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse updateAnyTask(Long taskId, UpdateTaskRequest request) {
         Task task = requireTask(taskId);
         taskMapper.applyUpdate(task, request, requireStatus(request.status()));
-        return taskMapper.toResponse(task);
+        TaskResponse response = taskMapper.toResponse(task);
+
+        publish(task.getOwner().getId(), TaskEvent.updated(response));
+        return response;
     }
 
     @Override
     @Transactional
     public void deleteAnyTask(Long taskId) {
-        taskRepository.delete(requireTask(taskId));
+        Task task = requireTask(taskId);
+        Long taskOwnerId = task.getOwner().getId();
+        taskRepository.delete(task);
+
+        publish(taskOwnerId, TaskEvent.deleted(taskId));
     }
 
     // ============================================================
@@ -127,5 +144,15 @@ public class TaskServiceImpl implements TaskService {
     private TaskStatus requireStatus(String code) {
         return taskStatusRepository.findByCode(code)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_TASK_STATUS, code));
+    }
+
+    /** Blank filter -> null so the search query treats it as "no filter". */
+    private String normalize(String statusCode) {
+        return StringUtils.hasText(statusCode) ? statusCode : null;
+    }
+
+    /** Raises an after-commit event so clients are notified only on success. */
+    private void publish(Long ownerId, TaskEvent event) {
+        eventPublisher.publishEvent(new TaskChangedEvent(ownerId, event));
     }
 }

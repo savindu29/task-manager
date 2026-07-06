@@ -11,9 +11,11 @@ import me.savindu.task_manager_backend.common.response.PaginationRequest;
 import me.savindu.task_manager_backend.dto.CreateTaskRequest;
 import me.savindu.task_manager_backend.dto.TaskResponse;
 import me.savindu.task_manager_backend.dto.UpdateTaskRequest;
+import me.savindu.task_manager_backend.messaging.TaskStreamService;
 import me.savindu.task_manager_backend.security.AppUserDetails;
 import me.savindu.task_manager_backend.service.TaskService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Task endpoints for the authenticated user. Every operation is scoped to the
@@ -38,6 +41,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TaskStreamService taskStreamService;
+
+    @Operation(summary = "Subscribe to real-time updates for the current user's tasks (SSE)")
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter stream(@AuthenticationPrincipal AppUserDetails principal) {
+        return taskStreamService.subscribeOwner(principal.getId());
+    }
 
     @Operation(summary = "Create a task owned by the current user")
     @PostMapping
