@@ -1,0 +1,46 @@
+"use client";
+
+import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+
+/**
+ * Password input with a show/hide toggle. Forwards all native input props to
+ * the underlying <Input>; the `type` is controlled internally by the toggle.
+ */
+function PasswordInput({
+  className,
+  ...props
+}: Omit<React.ComponentProps<typeof Input>, "type">) {
+  const [visible, setVisible] = React.useState(false);
+
+  return (
+    <div className="relative">
+      <Input
+        type={visible ? "text" : "password"}
+        className={cn("pr-8", className)}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        // Don't steal focus from the field on click.
+        onMouseDown={(e) => e.preventDefault()}
+        tabIndex={-1}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        className="absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground transition-colors hover:text-foreground"
+      >
+        {visible ? (
+          <EyeOff className="size-4" />
+        ) : (
+          <Eye className="size-4" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+export { PasswordInput };
