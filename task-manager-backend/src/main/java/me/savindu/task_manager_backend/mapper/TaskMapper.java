@@ -46,6 +46,7 @@ public class TaskMapper {
                 task.getDueDate(),
                 task.getOwner().getId(),
                 task.getOwner().getName(),
+                task.getOwner().getEmail(),
                 task.getCreatedAt(),
                 task.getUpdatedAt()
         );

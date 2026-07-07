@@ -15,6 +15,7 @@ public record TaskResponse(
         Instant dueDate,
         Long ownerId,
         String ownerName,
+        String ownerEmail,
         Instant createdAt,
         Instant updatedAt
 ) {
