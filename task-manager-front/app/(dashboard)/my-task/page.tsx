@@ -5,16 +5,16 @@ import { Plus } from "lucide-react";
 
 import { ApiError } from "@/lib/api";
 import {
-  listTasks,
   formatStatus,
   TASK_STATUSES,
   type Task,
   type TaskEvent,
   type TaskStatus,
 } from "@/lib/tasks";
+import { listTasks } from "@/services/task.service";
 import { useTaskStream } from "@/hooks/use-task-stream";
-import { TaskBoard } from "@/components/tasks/task-board";
-import { TaskDialog } from "@/components/tasks/task-dialog";
+import { TaskViews } from "@/components/tasks/task-views";
+import { TaskSheet } from "@/components/tasks/task-sheet";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 
-// Fetch a generous page so the grouped view shows everything at once.
+// Fetch a generous page so the grouped views show everything at once.
 const PAGE_SIZE = 100;
 
 type Filter = "ALL" | TaskStatus;
@@ -37,12 +37,10 @@ export default function MyTasksPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [filter, setFilter] = React.useState<Filter>("ALL");
 
-  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [sheetOpen, setSheetOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Task | null>(null);
   const [createStatus, setCreateStatus] = React.useState<TaskStatus>("TODO");
 
-  // Shared loader for user-initiated fetches (filter change, retry). Setting
-  // the loading flag synchronously here is fine — these run in event handlers.
   const load = React.useCallback(async (current: Filter) => {
     setLoading(true);
     setError(null);
@@ -62,9 +60,6 @@ export default function MyTasksPage() {
     }
   }, []);
 
-  // Initial load on mount only. Inlined (state set post-await) so it doesn't
-  // trip the "no synchronous setState in effect" rule; subsequent loads are
-  // driven by handlers via `changeFilter`/retry.
   React.useEffect(() => {
     let active = true;
     (async () => {
@@ -77,9 +72,7 @@ export default function MyTasksPage() {
       } catch (err) {
         if (active) {
           setError(
-            err instanceof ApiError
-              ? err.message
-              : "Failed to load your tasks.",
+            err instanceof ApiError ? err.message : "Failed to load your tasks.",
           );
         }
       } finally {
@@ -91,13 +84,6 @@ export default function MyTasksPage() {
     };
   }, []);
 
-  function changeFilter(next: Filter) {
-    setFilter(next);
-    void load(next);
-  }
-
-  // Idempotent upsert/remove so our own optimistic updates and real-time
-  // events can't create duplicates. Respects the active status filter.
   const upsert = React.useCallback(
     (task: Task) => {
       setTasks((prev) => {
@@ -113,34 +99,35 @@ export default function MyTasksPage() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Real-time updates (also covers changes from other tabs/devices).
   const onStreamEvent = React.useCallback(
     (event: TaskEvent) => {
-      if (event.type === "DELETED") {
-        remove(event.taskId);
-      } else if (event.task) {
-        upsert(event.task);
-      }
+      if (event.type === "DELETED") remove(event.taskId);
+      else if (event.task) upsert(event.task);
     },
     [remove, upsert],
   );
   useTaskStream(onStreamEvent);
 
+  function changeFilter(next: Filter) {
+    setFilter(next);
+    void load(next);
+  }
+
   function openCreate(status: TaskStatus) {
     setEditing(null);
     setCreateStatus(status);
-    setDialogOpen(true);
+    setSheetOpen(true);
   }
 
   function openEdit(task: Task) {
     setEditing(task);
-    setDialogOpen(true);
+    setSheetOpen(true);
   }
 
   const visibleStatuses = filter === "ALL" ? TASK_STATUSES : [filter];
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">My Tasks</h1>
@@ -151,7 +138,7 @@ export default function MyTasksPage() {
         <div className="flex items-center gap-2">
           <Select
             value={filter}
-            onValueChange={(value) => changeFilter(value as Filter)}
+            onValueChange={(value) => changeFilter((value ?? "ALL") as Filter)}
           >
             <SelectTrigger aria-label="Filter by status" className="w-40">
               <SelectValue>
@@ -186,7 +173,7 @@ export default function MyTasksPage() {
           </Button>
         </div>
       ) : (
-        <TaskBoard
+        <TaskViews
           tasks={tasks}
           statuses={visibleStatuses}
           onEdit={openEdit}
@@ -196,9 +183,9 @@ export default function MyTasksPage() {
         />
       )}
 
-      <TaskDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+      <TaskSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
         task={editing}
         defaultStatus={createStatus}
         onSaved={upsert}

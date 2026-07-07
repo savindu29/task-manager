@@ -41,7 +41,7 @@ export default function LoginPage() {
     try {
       const user = await login({ email, password });
       toast.success(`Welcome back, ${user.name}`);
-      router.replace("/");
+      router.replace("/my-task");
     } catch (error) {
       if (error instanceof ApiError) {
         setFieldErrors(error.fieldErrors);

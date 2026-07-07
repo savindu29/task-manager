@@ -42,7 +42,7 @@ export default function RegisterPage() {
     try {
       const user = await register({ name, email, password });
       toast.success(`Welcome, ${user.name}`);
-      router.replace("/");
+      router.replace("/my-task");
     } catch (error) {
       if (error instanceof ApiError) {
         setFieldErrors(error.fieldErrors);

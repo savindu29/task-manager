@@ -9,7 +9,7 @@
  * that read `user`/`status` (see app/(dashboard)/layout.tsx).
  */
 import * as React from "react";
-import * as auth from "@/lib/auth";
+import * as auth from "@/services/user.service";
 import { ApiError } from "@/lib/api";
 import type { LoginInput, RegisterInput, User } from "@/lib/auth";
 

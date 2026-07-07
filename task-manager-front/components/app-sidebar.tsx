@@ -4,13 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  LayoutDashboard,
-  FolderKanban,
-  ListChecks,
-  Layers,
-  LogOut,
-} from "lucide-react";
+import { ListChecks, Layers, ShieldCheck, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
@@ -20,6 +14,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -27,9 +22,11 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "My Tasks", url: "/my-task", icon: ListChecks },
+const navItems = [{ title: "My Tasks", url: "/my-task", icon: ListChecks }];
+
+// Admin-only navigation (rendered only when the user has the ADMIN role).
+const adminNavItems = [
+  { title: "All Tasks", url: "/admin/tasks", icon: ShieldCheck },
 ];
 
 const menuButton = "h-7 rounded-lg px-2 py-1 text-xs";
@@ -54,13 +51,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="none" className="sticky top-0 h-svh" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-3">
+        <div className="flex items-center gap-2 px-1 py-2">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-black text-white">
             <Layers className="size-5" />
           </div>
-          <span className="text-2xl font-bold tracking-tight">Trackr</span>
+          <span className="text-2xl font-bold tracking-tight group-data-[collapsible=icon]:hidden">
+            Trackr
+          </span>
         </div>
         <SidebarSeparator className="mx-0" />
       </SidebarHeader>
@@ -85,6 +84,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Admin navigation — visible only to admins */}
+        {user?.role === "ADMIN" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminNavItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      render={<Link href={item.url} />}
+                      isActive={pathname === item.url}
+                      className={menuButton}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       {/* Footer */}

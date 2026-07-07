@@ -20,9 +20,16 @@ export function proxy(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 
+  // There is no dashboard route: the app home is /my-task.
+  if (pathname === "/") {
+    return NextResponse.redirect(
+      new URL(hasSession ? "/my-task" : "/login", request.url),
+    );
+  }
+
   // Signed-in users shouldn't see the auth pages.
   if (hasSession && isAuthRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/my-task", request.url));
   }
 
   // Everything else in scope is app content: require a session cookie.

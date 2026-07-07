@@ -1,10 +1,8 @@
 /**
- * Task API surface for the authenticated USER. Maps 1:1 to `/api/tasks/*`.
- * Every call is scoped server-side to the caller's own tasks (owner comes from
- * the auth principal, never the client). Returns unwrapped payloads or throws
- * {@link ApiError}.
+ * Task domain types and UI helpers, shared by the USER and ADMIN task views.
+ * Maps to the `/api/tasks/*` and `/api/admin/tasks/*` contracts. The API calls
+ * that use these types live in `@/services/task.service`.
  */
-import { api } from "@/lib/api";
 
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -35,6 +33,7 @@ export interface Task {
   dueDate: string; // ISO-8601 instant
   ownerId: number;
   ownerName: string;
+  ownerEmail: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -76,40 +75,6 @@ export interface ListTasksParams {
   size?: number;
   sortBy?: string;
   sortDirection?: "ASC" | "DESC";
-}
-
-function buildQuery(params: ListTasksParams): string {
-  const query = new URLSearchParams();
-  if (params.status) query.set("status", params.status);
-  if (params.page != null) query.set("page", String(params.page));
-  if (params.size != null) query.set("size", String(params.size));
-  if (params.sortBy) query.set("sortBy", params.sortBy);
-  if (params.sortDirection) query.set("sortDirection", params.sortDirection);
-  const qs = query.toString();
-  return qs ? `?${qs}` : "";
-}
-
-/** Paginated list of the current user's tasks, optionally filtered by status. */
-export function listTasks(
-  params: ListTasksParams = {},
-): Promise<Paginated<Task>> {
-  return api.get<Paginated<Task>>(`/api/tasks${buildQuery(params)}`);
-}
-
-export function getTask(id: number): Promise<Task> {
-  return api.get<Task>(`/api/tasks/${id}`);
-}
-
-export function createTask(input: CreateTaskInput): Promise<Task> {
-  return api.post<Task>("/api/tasks", input);
-}
-
-export function updateTask(id: number, input: UpdateTaskInput): Promise<Task> {
-  return api.put<Task>(`/api/tasks/${id}`, input);
-}
-
-export function deleteTask(id: number): Promise<void> {
-  return api.delete<void>(`/api/tasks/${id}`);
 }
 
 /** Absolute URL for the SSE stream (EventSource can't use relative paths). */

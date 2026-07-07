@@ -23,7 +23,7 @@ export default function AuthLayout({
 
   React.useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/");
+      router.replace("/my-task");
     }
   }, [status, router]);
 

@@ -1,15 +1,21 @@
 /**
- * Thin, typed client for the task-manager backend.
+ * Thin, typed client for the task-manager backend, built on axios.
  *
  * The backend authenticates via an HTTP-only JWT cookie, so the browser sends
- * and receives it automatically — we never read or store the token in JS. Every
- * request therefore uses `credentials: "include"` so the cookie travels
- * cross-origin (the backend enables CORS `allowCredentials`).
+ * and receives it automatically — we never read or store the token in JS. The
+ * axios instance sets `withCredentials: true` so the cookie travels cross-origin
+ * (the backend enables CORS `allowCredentials`).
  *
  * Responses are wrapped in a standard envelope (see backend `ApiResponse`):
  *   { success, code, message, timestamp, data }
- * `request()` unwraps `data` on success and throws a typed `ApiError` otherwise.
+ * A response interceptor unwraps `data` on success and throws a typed
+ * `ApiError` otherwise, so callers can `try/catch` uniformly.
  */
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+} from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
@@ -46,68 +52,84 @@ export class ApiError extends Error {
   }
 }
 
-type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
+/** Build an {@link ApiError} from a (possibly missing) response envelope. */
+function toApiError(
+  status: number,
+  envelope: Partial<ApiEnvelope<unknown>> | undefined,
+): ApiError {
+  const data = envelope?.data;
+  const fieldErrors =
+    data && typeof data === "object" && !Array.isArray(data)
+      ? (data as Record<string, string>)
+      : {};
 
-/**
- * Perform a request against the API and return the unwrapped `data` payload.
- * Throws {@link ApiError} on any error so callers can `try/catch` uniformly.
- */
-export async function request<T>(
-  path: string,
-  { body, headers, ...init }: RequestOptions = {},
-): Promise<T> {
-  let response: Response;
+  return new ApiError(
+    status,
+    envelope?.code ?? "UNKNOWN",
+    envelope?.message ?? "Something went wrong. Please try again.",
+    fieldErrors,
+  );
+}
 
-  try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      ...init,
-      credentials: "include",
-      headers: {
-        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-        ...headers,
-      },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-    });
-  } catch {
-    // Network error, backend down, CORS rejection, etc.
+const client: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Unwrap the envelope on the way out; turn any failure into an ApiError.
+client.interceptors.response.use(
+  (response) => {
+    const envelope = response.data as Partial<ApiEnvelope<unknown>> | undefined;
+    // A 2xx with success:false is still a business error (mirrors backend).
+    if (envelope && envelope.success === false) {
+      throw toApiError(response.status, envelope);
+    }
+    // Replace the raw envelope with the unwrapped `data` payload.
+    response.data = envelope ? envelope.data : undefined;
+    return response;
+  },
+  (error: AxiosError) => {
+    if (error instanceof ApiError) throw error;
+    if (error.response) {
+      throw toApiError(
+        error.response.status,
+        error.response.data as Partial<ApiEnvelope<unknown>> | undefined,
+      );
+    }
+    // No response = network error, backend down, CORS rejection, etc.
     throw new ApiError(
       0,
       "NETWORK_ERROR",
       "Unable to reach the server. Please check your connection and try again.",
     );
-  }
+  },
+);
 
-  // 204 / empty bodies (e.g. logout) — nothing to parse.
-  const text = await response.text();
-  const envelope: Partial<ApiEnvelope<T>> = text ? JSON.parse(text) : {};
+/** Per-call overrides (headers, params, signal, …); method/url/data are set by the helpers. */
+export type RequestOptions = Omit<
+  AxiosRequestConfig,
+  "url" | "method" | "data" | "baseURL"
+>;
 
-  if (!response.ok || envelope.success === false) {
-    const data = envelope.data;
-    const fieldErrors =
-      data && typeof data === "object" && !Array.isArray(data)
-        ? (data as Record<string, string>)
-        : {};
-
-    throw new ApiError(
-      response.status,
-      envelope.code ?? "UNKNOWN",
-      envelope.message ?? "Something went wrong. Please try again.",
-      fieldErrors,
-    );
-  }
-
-  return envelope.data as T;
+/**
+ * Perform a request against the API and return the unwrapped `data` payload.
+ * Throws {@link ApiError} on any error so callers can `try/catch` uniformly.
+ */
+export async function request<T>(config: AxiosRequestConfig): Promise<T> {
+  const response = await client.request<T>(config);
+  return response.data as T;
 }
 
 export const api = {
-  get: <T>(path: string, init?: RequestOptions) =>
-    request<T>(path, { ...init, method: "GET" }),
-  post: <T>(path: string, body?: unknown, init?: RequestOptions) =>
-    request<T>(path, { ...init, method: "POST", body }),
-  put: <T>(path: string, body?: unknown, init?: RequestOptions) =>
-    request<T>(path, { ...init, method: "PUT", body }),
-  patch: <T>(path: string, body?: unknown, init?: RequestOptions) =>
-    request<T>(path, { ...init, method: "PATCH", body }),
-  delete: <T>(path: string, init?: RequestOptions) =>
-    request<T>(path, { ...init, method: "DELETE" }),
+  get: <T>(path: string, options?: RequestOptions) =>
+    request<T>({ ...options, url: path, method: "GET" }),
+  post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>({ ...options, url: path, method: "POST", data: body }),
+  put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>({ ...options, url: path, method: "PUT", data: body }),
+  patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>({ ...options, url: path, method: "PATCH", data: body }),
+  delete: <T>(path: string, options?: RequestOptions) =>
+    request<T>({ ...options, url: path, method: "DELETE" }),
 };
