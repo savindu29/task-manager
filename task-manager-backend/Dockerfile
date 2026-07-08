@@ -24,5 +24,5 @@ RUN groupadd -r spring && useradd -r -g spring spring
 COPY --from=build /app/target/task-manager-backend-*.jar app.jar
 USER spring
 
-EXPOSE 8080
+EXPOSE 5000
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
