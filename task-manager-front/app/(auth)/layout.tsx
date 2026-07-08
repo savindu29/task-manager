@@ -6,6 +6,7 @@
  * screens. Already authenticated users are bounced to the app.
  */
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Layers } from "lucide-react";
@@ -52,10 +53,13 @@ export default function AuthLayout({
       </div>
 
       <div className="relative hidden overflow-hidden bg-muted lg:block">
-        <img
+        <Image
           src="/wallpaper/wallpaper.jpg"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover"
         />
         {/* Scrim so the overlaid white text stays readable. */}
         <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-black/40" />
