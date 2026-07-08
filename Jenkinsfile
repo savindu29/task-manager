@@ -82,7 +82,7 @@ pipeline {
             docker rm -f $CONTAINER 2>/dev/null || true
             docker run -d --name $CONTAINER --restart unless-stopped \
               --env-file "$ENV_FILE" \
-              -p 8080:8080 \
+              -p 8081:8080 \
               $IMAGE:latest
           '''
         }
