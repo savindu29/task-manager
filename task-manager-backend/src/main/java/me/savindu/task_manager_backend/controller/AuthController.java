@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.savindu.task_manager_backend.common.code.SuccessCode;
 import me.savindu.task_manager_backend.common.response.ApiResponse;
+import me.savindu.task_manager_backend.dto.AuthResponse;
 import me.savindu.task_manager_backend.dto.LoginRequest;
 import me.savindu.task_manager_backend.dto.RegisterRequest;
 import me.savindu.task_manager_backend.dto.UserResponse;
@@ -33,26 +34,28 @@ public class AuthController {
     private final CookieService cookieService;
     private final UserMapper userMapper;
 
-    @Operation(summary = "Register a new user account (role USER)")
+    @Operation(summary = "Register a new user account (role USER); returns a JWT and sets the auth cookie")
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         AuthService.AuthResult result = authService.register(request);
         ResponseCookie cookie = cookieService.createAuthCookie(result.token());
 
         return ResponseEntity.status(SuccessCode.USER_REGISTERED.getStatus())
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(ApiResponse.success(SuccessCode.USER_REGISTERED, result.user()));
+                .body(ApiResponse.success(SuccessCode.USER_REGISTERED,
+                        new AuthResponse(result.token(), result.user())));
     }
 
-    @Operation(summary = "Authenticate and receive the HTTP-only auth cookie")
+    @Operation(summary = "Authenticate; returns a JWT (Bearer) and also sets the auth cookie")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthService.AuthResult result = authService.login(request);
         ResponseCookie cookie = cookieService.createAuthCookie(result.token());
 
         return ResponseEntity.status(SuccessCode.LOGIN_SUCCESS.getStatus())
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS, result.user()));
+                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS,
+                        new AuthResponse(result.token(), result.user())));
     }
 
     @Operation(summary = "Clear the auth cookie")

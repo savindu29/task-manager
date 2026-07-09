@@ -27,3 +27,9 @@ export interface LoginInput {
   email: string;
   password: string;
 }
+
+/** Body returned by /api/auth/login and /api/auth/register. */
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
