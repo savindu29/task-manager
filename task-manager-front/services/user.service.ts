@@ -9,21 +9,30 @@
  * Types (User, Role, LoginInput, RegisterInput) live in `@/lib/auth`.
  */
 import { api } from "@/lib/api";
-import type { LoginInput, RegisterInput, User } from "@/lib/auth";
+import type { AuthResponse, LoginInput, RegisterInput, User } from "@/lib/auth";
+import { clearToken, setToken } from "@/lib/auth-token";
 
-/** Create a USER account and log in (backend sets the auth cookie). */
-export function register(input: RegisterInput): Promise<User> {
-  return api.post<User>("/api/auth/register", input);
+/** Create a USER account and log in; stores the returned JWT. */
+export async function register(input: RegisterInput): Promise<User> {
+  const result = await api.post<AuthResponse>("/api/auth/register", input);
+  setToken(result.token);
+  return result.user;
 }
 
-/** Authenticate; backend sets the auth cookie on success. */
-export function login(input: LoginInput): Promise<User> {
-  return api.post<User>("/api/auth/login", input);
+/** Authenticate; stores the returned JWT for subsequent Bearer requests. */
+export async function login(input: LoginInput): Promise<User> {
+  const result = await api.post<AuthResponse>("/api/auth/login", input);
+  setToken(result.token);
+  return result.user;
 }
 
-/** Clear the auth cookie server-side. */
-export function logout(): Promise<void> {
-  return api.post<void>("/api/auth/logout");
+/** Clear the token locally (and best-effort the server cookie). */
+export async function logout(): Promise<void> {
+  try {
+    await api.post<void>("/api/auth/logout");
+  } finally {
+    clearToken();
+  }
 }
 
 /** Resolve the currently authenticated user; throws 401 ApiError if none. */

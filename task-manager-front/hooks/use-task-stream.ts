@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { getToken } from "@/lib/auth-token";
 import { TASK_STREAM_URL, type TaskEvent } from "@/lib/tasks";
 
 /**
@@ -10,8 +11,8 @@ import { TASK_STREAM_URL, type TaskEvent } from "@/lib/tasks";
  * admin stream URL to receive changes to all tasks. The connection is opened
  * once (per URL) and closed on unmount; EventSource auto-reconnects.
  *
- * `withCredentials` is required so the HTTP-only auth cookie rides along on the
- * cross-origin stream request (the backend allows credentialed CORS).
+ * EventSource cannot set request headers, so the JWT is passed as a `token`
+ * query parameter (the backend accepts it there for the stream endpoints).
  */
 export function useTaskStream(
   onEvent: (event: TaskEvent) => void,
@@ -24,7 +25,11 @@ export function useTaskStream(
   });
 
   React.useEffect(() => {
-    const source = new EventSource(url, { withCredentials: true });
+    const token = getToken();
+    const streamUrl = token
+      ? `${url}?token=${encodeURIComponent(token)}`
+      : url;
+    const source = new EventSource(streamUrl, { withCredentials: true });
 
     source.addEventListener("task", (event) => {
       try {

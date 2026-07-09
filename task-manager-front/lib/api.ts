@@ -17,6 +17,8 @@ import axios, {
   type AxiosRequestConfig,
 } from "axios";
 
+import { getToken } from "@/lib/auth-token";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 /** Standard response envelope returned by every backend endpoint. */
@@ -75,6 +77,16 @@ const client: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
+});
+
+// Attach the JWT as a Bearer header when we have one. This is the primary auth
+// mechanism cross-origin; the cookie (withCredentials) still works same-origin.
+client.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Unwrap the envelope on the way out; turn any failure into an ApiError.
