@@ -1,0 +1,1389 @@
+{
+  "info": {
+    "_postman_id": "b5b34499-d734-4764-9fb3-3f40997e698b",
+    "name": "Task Manager API",
+    "description": "Task Manager backend API.\n\nAuthentication uses a JWT stored in an HTTP-only cookie.\nCall POST /api/auth/login (or /api/auth/register) to receive\nthe cookie; subsequent requests are authenticated automatically.\n\nRoles: USER (own tasks) and ADMIN (all tasks).\n\nContact Support:\n Name: Task Manager\n Email: example@arktide.io",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56507727",
+    "_collection_link": "https://go.postman.co/collection/56507727-b5b34499-d734-4764-9fb3-3f40997e698b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "tasks",
+      "item": [
+        {
+          "name": "List the current user's tasks (paginated, optional status code filter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?status=string&page=9184&size=74&sortBy=string&sortDirection=ASC&multiSort=string&searchQuery=string&filterBy=string&filterValue=string",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "string"
+                },
+                {
+                  "key": "page",
+                  "value": "9184"
+                },
+                {
+                  "key": "size",
+                  "value": "74"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "string"
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "ASC"
+                },
+                {
+                  "key": "multiSort",
+                  "value": "string"
+                },
+                {
+                  "key": "searchQuery",
+                  "value": "string"
+                },
+                {
+                  "key": "filterBy",
+                  "value": "string"
+                },
+                {
+                  "key": "filterValue",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks?status=string&page=9184&size=74&sortBy=string&sortDirection=ASC&multiSort=string&searchQuery=string&filterBy=string&filterValue=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "string"
+                    },
+                    {
+                      "key": "page",
+                      "value": "9184"
+                    },
+                    {
+                      "key": "size",
+                      "value": "74"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "string"
+                    },
+                    {
+                      "key": "sortDirection",
+                      "value": "ASC"
+                    },
+                    {
+                      "key": "multiSort",
+                      "value": "string"
+                    },
+                    {
+                      "key": "searchQuery",
+                      "value": "string"
+                    },
+                    {
+                      "key": "filterBy",
+                      "value": "string"
+                    },
+                    {
+                      "key": "filterValue",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"1947-08-22T03:38:21.767Z\",\n  \"data\": {\n    \"contentSize\": 6835,\n    \"empty\": true,\n    \"content\": [\n      {\n        \"id\": 3728,\n        \"title\": \"string\",\n        \"description\": \"string\",\n        \"status\": \"string\",\n        \"dueDate\": \"2000-02-04T01:53:43.328Z\",\n        \"ownerId\": 7525,\n        \"ownerName\": \"string\",\n        \"ownerEmail\": \"string\",\n        \"createdAt\": \"1952-07-18T17:04:03.047Z\",\n        \"updatedAt\": \"1958-09-15T04:43:15.191Z\"\n      },\n      {\n        \"id\": 2654,\n        \"title\": \"string\",\n        \"description\": \"string\",\n        \"status\": \"string\",\n        \"dueDate\": \"1999-07-03T23:10:58.863Z\",\n        \"ownerId\": 4111,\n        \"ownerName\": \"string\",\n        \"ownerEmail\": \"string\",\n        \"createdAt\": \"1948-03-01T16:57:42.628Z\",\n        \"updatedAt\": \"1960-04-22T16:02:25.860Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 7445,\n      \"pageSize\": 2905,\n      \"totalPages\": 3338,\n      \"totalElements\": 1093,\n      \"hasNext\": true,\n      \"hasPrevious\": true,\n      \"isFirst\": true,\n      \"isLast\": true,\n      \"numberOfElements\": 5624\n    },\n    \"sort\": {\n      \"sorted\": false,\n      \"unsorted\": false,\n      \"empty\": true,\n      \"sortOrders\": [\n        {\n          \"property\": \"string\",\n          \"direction\": \"string\",\n          \"ignoreCase\": false,\n          \"nullHandling\": \"string\"\n        },\n        {\n          \"property\": \"string\",\n          \"direction\": \"string\",\n          \"ignoreCase\": true,\n          \"nullHandling\": \"string\"\n        }\n      ]\n    },\n    \"metadata\": {\n      \"timestamp\": \"2011-05-10T07:19:56.057Z\",\n      \"totalElements\": 6728,\n      \"requestId\": \"string\",\n      \"apiVersion\": \"string\",\n      \"processingTime\": 4131,\n      \"message\": \"string\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create a task owned by the current user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"1993-12-10T18:26:05.821Z\",\n  \"title\": \"string\",\n  \"description\": \"\",\n  \"status\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dueDate\": \"1993-12-10T18:26:05.821Z\",\n  \"title\": \"string\",\n  \"description\": \"\",\n  \"status\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-04-01T13:07:17.740Z\",\n  \"data\": {\n    \"id\": 7294,\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"status\": \"string\",\n    \"dueDate\": \"2008-08-08T09:24:00.715Z\",\n    \"ownerId\": 3237,\n    \"ownerName\": \"string\",\n    \"ownerEmail\": \"string\",\n    \"createdAt\": \"1949-01-31T04:19:12.195Z\",\n    \"updatedAt\": \"1959-09-01T15:45:00.636Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Subscribe to real-time updates for the current user's tasks (SSE)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/stream",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "stream"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "text/event-stream"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/stream",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks",
+                    "stream"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/event-stream"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timeout\": 2458\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get one of the current user's tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-04-01T13:07:17.740Z\",\n  \"data\": {\n    \"id\": 7294,\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"status\": \"string\",\n    \"dueDate\": \"2008-08-08T09:24:00.715Z\",\n    \"ownerId\": 3237,\n    \"ownerName\": \"string\",\n    \"ownerEmail\": \"string\",\n    \"createdAt\": \"1949-01-31T04:19:12.195Z\",\n    \"updatedAt\": \"1959-09-01T15:45:00.636Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update one of the current user's tasks",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"1981-03-25T06:56:44.821Z\",\n  \"status\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dueDate\": \"1981-03-25T06:56:44.821Z\",\n  \"status\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-04-01T13:07:17.740Z\",\n  \"data\": {\n    \"id\": 7294,\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"status\": \"string\",\n    \"dueDate\": \"2008-08-08T09:24:00.715Z\",\n    \"ownerId\": 3237,\n    \"ownerName\": \"string\",\n    \"ownerEmail\": \"string\",\n    \"createdAt\": \"1949-01-31T04:19:12.195Z\",\n    \"updatedAt\": \"1959-09-01T15:45:00.636Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete one of the current user's tasks",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-09-20T01:51:33.558Z\",\n  \"data\": \"\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "Get any task by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-04-01T13:07:17.740Z\",\n  \"data\": {\n    \"id\": 7294,\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"status\": \"string\",\n    \"dueDate\": \"2008-08-08T09:24:00.715Z\",\n    \"ownerId\": 3237,\n    \"ownerName\": \"string\",\n    \"ownerEmail\": \"string\",\n    \"createdAt\": \"1949-01-31T04:19:12.195Z\",\n    \"updatedAt\": \"1959-09-01T15:45:00.636Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update any task by id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"1981-03-25T06:56:44.821Z\",\n  \"status\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dueDate\": \"1981-03-25T06:56:44.821Z\",\n  \"status\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-04-01T13:07:17.740Z\",\n  \"data\": {\n    \"id\": 7294,\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"status\": \"string\",\n    \"dueDate\": \"2008-08-08T09:24:00.715Z\",\n    \"ownerId\": 3237,\n    \"ownerName\": \"string\",\n    \"ownerEmail\": \"string\",\n    \"createdAt\": \"1949-01-31T04:19:12.195Z\",\n    \"updatedAt\": \"1959-09-01T15:45:00.636Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete any task by id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/tasks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "3806"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/tasks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "tasks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "3806"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-09-20T01:51:33.558Z\",\n  \"data\": \"\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Subscribe to real-time updates for all tasks (SSE, admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/tasks/stream",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "tasks",
+                "stream"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "text/event-stream"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/tasks/stream",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "tasks",
+                    "stream"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/event-stream"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timeout\": 2458\n}"
+            }
+          ]
+        },
+        {
+          "name": "List all tasks (paginated, optional status code and owner id filters)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/tasks?status=string&ownerId=3806&page=9184&size=74&sortBy=string&sortDirection=ASC&multiSort=string&searchQuery=string&filterBy=string&filterValue=string",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "string"
+                },
+                {
+                  "key": "ownerId",
+                  "value": "3806"
+                },
+                {
+                  "key": "page",
+                  "value": "9184"
+                },
+                {
+                  "key": "size",
+                  "value": "74"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "string"
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "ASC"
+                },
+                {
+                  "key": "multiSort",
+                  "value": "string"
+                },
+                {
+                  "key": "searchQuery",
+                  "value": "string"
+                },
+                {
+                  "key": "filterBy",
+                  "value": "string"
+                },
+                {
+                  "key": "filterValue",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/tasks?status=string&ownerId=3806&page=9184&size=74&sortBy=string&sortDirection=ASC&multiSort=string&searchQuery=string&filterBy=string&filterValue=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "tasks"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "string"
+                    },
+                    {
+                      "key": "ownerId",
+                      "value": "3806"
+                    },
+                    {
+                      "key": "page",
+                      "value": "9184"
+                    },
+                    {
+                      "key": "size",
+                      "value": "74"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "string"
+                    },
+                    {
+                      "key": "sortDirection",
+                      "value": "ASC"
+                    },
+                    {
+                      "key": "multiSort",
+                      "value": "string"
+                    },
+                    {
+                      "key": "searchQuery",
+                      "value": "string"
+                    },
+                    {
+                      "key": "filterBy",
+                      "value": "string"
+                    },
+                    {
+                      "key": "filterValue",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"1947-08-22T03:38:21.767Z\",\n  \"data\": {\n    \"contentSize\": 6835,\n    \"empty\": true,\n    \"content\": [\n      {\n        \"id\": 3728,\n        \"title\": \"string\",\n        \"description\": \"string\",\n        \"status\": \"string\",\n        \"dueDate\": \"2000-02-04T01:53:43.328Z\",\n        \"ownerId\": 7525,\n        \"ownerName\": \"string\",\n        \"ownerEmail\": \"string\",\n        \"createdAt\": \"1952-07-18T17:04:03.047Z\",\n        \"updatedAt\": \"1958-09-15T04:43:15.191Z\"\n      },\n      {\n        \"id\": 2654,\n        \"title\": \"string\",\n        \"description\": \"string\",\n        \"status\": \"string\",\n        \"dueDate\": \"1999-07-03T23:10:58.863Z\",\n        \"ownerId\": 4111,\n        \"ownerName\": \"string\",\n        \"ownerEmail\": \"string\",\n        \"createdAt\": \"1948-03-01T16:57:42.628Z\",\n        \"updatedAt\": \"1960-04-22T16:02:25.860Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 7445,\n      \"pageSize\": 2905,\n      \"totalPages\": 3338,\n      \"totalElements\": 1093,\n      \"hasNext\": true,\n      \"hasPrevious\": true,\n      \"isFirst\": true,\n      \"isLast\": true,\n      \"numberOfElements\": 5624\n    },\n    \"sort\": {\n      \"sorted\": false,\n      \"unsorted\": false,\n      \"empty\": true,\n      \"sortOrders\": [\n        {\n          \"property\": \"string\",\n          \"direction\": \"string\",\n          \"ignoreCase\": false,\n          \"nullHandling\": \"string\"\n        },\n        {\n          \"property\": \"string\",\n          \"direction\": \"string\",\n          \"ignoreCase\": true,\n          \"nullHandling\": \"string\"\n        }\n      ]\n    },\n    \"metadata\": {\n      \"timestamp\": \"2011-05-10T07:19:56.057Z\",\n      \"totalElements\": 6728,\n      \"requestId\": \"string\",\n      \"apiVersion\": \"string\",\n      \"processingTime\": 4131,\n      \"message\": \"string\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Register a new user account (role USER); returns a JWT and sets the auth cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hiRt-9H99rK@pUhgYGxIbqBaeZUhptWCjQLEs.nvzb\",\n  \"name\": \"string\",\n  \"password\": \"stringstring\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"hiRt-9H99rK@pUhgYGxIbqBaeZUhptWCjQLEs.nvzb\",\n  \"name\": \"string\",\n  \"password\": \"stringstring\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"1963-01-06T23:02:20.983Z\",\n  \"data\": {\n    \"token\": \"string\",\n    \"user\": {\n      \"id\": 6021,\n      \"name\": \"string\",\n      \"email\": \"string\",\n      \"role\": \"string\",\n      \"createdAt\": \"1972-10-03T17:24:01.265Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get the currently authenticated user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2003-02-28T05:18:54.665Z\",\n  \"data\": {\n    \"id\": 5001,\n    \"name\": \"string\",\n    \"email\": \"string\",\n    \"role\": \"string\",\n    \"createdAt\": \"1975-06-18T19:21:20.468Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Authenticate; returns a JWT (Bearer) and also sets the auth cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"OhFoOBlxoq@jP.wdx\",\n  \"password\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"OhFoOBlxoq@jP.wdx\",\n  \"password\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"1963-01-06T23:02:20.983Z\",\n  \"data\": {\n    \"token\": \"string\",\n    \"user\": {\n      \"id\": 6021,\n      \"name\": \"string\",\n      \"email\": \"string\",\n      \"role\": \"string\",\n      \"createdAt\": \"1972-10-03T17:24:01.265Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Clear the auth cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "*/*"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: apikey",
+                    "key": "access_token",
+                    "value": "<API Key>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "*/*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"code\": \"string\",\n  \"message\": \"string\",\n  \"timestamp\": \"2016-09-20T01:51:33.558Z\",\n  \"data\": \"\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "access_token",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://16-16-75-232.sslip.io"
+    }
+  ]
+}
