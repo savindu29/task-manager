@@ -7,13 +7,7 @@ import org.springframework.http.MediaType;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-/**
- * Writes the standard {@code ApiResponse} error envelope directly to the servlet
- * response. Used by the security handlers, which run outside the Spring MVC /
- * message-converter stack and therefore cannot rely on the
- * {@code @RestControllerAdvice}. Kept dependency-free (no JSON library) to stay
- * agnostic of the Jackson version.
- */
+/** Writes the standard ApiResponse error envelope directly to the servlet response for the security handlers (no JSON library). */
 final class ErrorResponseWriter {
 
     private ErrorResponseWriter() {

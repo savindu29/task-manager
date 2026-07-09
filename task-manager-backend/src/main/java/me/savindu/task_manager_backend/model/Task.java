@@ -20,13 +20,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-/**
- * A task owned by exactly one {@link User}. Ownership drives authorization:
- * regular users may only touch tasks whose {@code owner} is themselves, while
- * admins may access every task. {@code status} is a FK to the
- * {@code r_task_statuses} reference table. Timestamps and auditor columns are
- * populated by {@link BaseAuditEntity}.
- */
+/** A task owned by one User; ownership drives authorization, status is a FK to r_task_statuses. */
 @Entity
 @Table(
         name = "m_tasks",

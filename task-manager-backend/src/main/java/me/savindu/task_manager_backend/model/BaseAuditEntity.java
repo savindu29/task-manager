@@ -13,16 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
-/**
- * Auditing base for persistent entities. Spring Data populates these fields
- * automatically on insert/update:
- * <ul>
- *   <li>{@code createdAt} / {@code updatedAt} - from the auditing DateTimeProvider</li>
- *   <li>{@code createdBy} / {@code updatedBy} - from {@code ApplicationAuditorAware}
- *       (the authenticated user's id; empty for unauthenticated actions such as
- *       registration or the startup admin seed)</li>
- * </ul>
- */
+/** Auditing base; Spring Data auto-populates createdAt/updatedAt and createdBy/updatedBy on insert/update. */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter

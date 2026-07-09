@@ -1,10 +1,6 @@
 package me.savindu.task_manager_backend.constant;
 
-/**
- * Well-known role codes (the natural keys of the {@code r_roles} reference
- * table). Used for seeding and lookups so the code stays type-checked without
- * reintroducing an enum.
- */
+/** Well-known role codes (natural keys of r_roles), used for seeding and lookups. */
 public final class RoleCode {
 
     public static final String USER = "USER";

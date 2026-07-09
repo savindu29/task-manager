@@ -5,15 +5,7 @@ import * as React from "react";
 import { getToken } from "@/lib/auth-token";
 import { TASK_STREAM_URL, type TaskEvent } from "@/lib/tasks";
 
-/**
- * Subscribe to a server-sent task stream and invoke `onEvent` for every
- * real-time change. Defaults to the current user's own-task stream; pass the
- * admin stream URL to receive changes to all tasks. The connection is opened
- * once (per URL) and closed on unmount; EventSource auto-reconnects.
- *
- * EventSource cannot set request headers, so the JWT is passed as a `token`
- * query parameter (the backend accepts it there for the stream endpoints).
- */
+/** Subscribe to the SSE task stream, calling `onEvent` per change; JWT passed as `?token=` (EventSource can't set headers). */
 export function useTaskStream(
   onEvent: (event: TaskEvent) => void,
   url: string = TASK_STREAM_URL,

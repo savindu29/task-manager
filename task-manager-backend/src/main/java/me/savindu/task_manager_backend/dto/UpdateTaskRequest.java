@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 
-/**
- * Full-replace payload for updating a task (PUT semantics). {@code status} is a
- * required status code. Ownership is not changeable through this DTO.
- */
+/** Full-replace update payload (PUT); status required, ownership not changeable. */
 public record UpdateTaskRequest(
 
         @NotBlank

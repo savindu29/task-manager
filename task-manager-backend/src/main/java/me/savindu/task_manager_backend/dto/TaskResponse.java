@@ -2,11 +2,7 @@ package me.savindu.task_manager_backend.dto;
 
 import java.time.Instant;
 
-/**
- * Public representation of a task. {@code status} is the status code (e.g. TODO).
- * Includes owner id/name so admins can see who a task belongs to. Built via
- * {@code mapper.TaskMapper}.
- */
+/** Public task view; status is the status code, includes owner id/name. */
 public record TaskResponse(
         Long id,
         String title,

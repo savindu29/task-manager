@@ -9,12 +9,14 @@ import {
   TASK_STATUSES,
   type PageMeta,
   type Task,
+  type TaskDateFilters,
   type TaskEvent,
   type TaskStatus,
 } from "@/lib/tasks";
 import { listTasks } from "@/services/task.service";
 import { useTaskStream } from "@/hooks/use-task-stream";
 import { TaskViews } from "@/components/tasks/task-views";
+import { TaskFilters } from "@/components/tasks/task-filters";
 import { TaskSheet } from "@/components/tasks/task-sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+const DEFAULT_PAGE_SIZE = 20;
 
 type Filter = "ALL" | TaskStatus;
 
@@ -38,19 +41,28 @@ export default function MyTasksPage() {
 
   const [filter, setFilter] = React.useState<Filter>("ALL");
   const [page, setPage] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
+  const [advanced, setAdvanced] = React.useState<TaskDateFilters>({});
 
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Task | null>(null);
   const [createStatus, setCreateStatus] = React.useState<TaskStatus>("TODO");
 
-  const load = React.useCallback(async (nextPage: number, current: Filter) => {
+  const load = React.useCallback(
+    async (
+      nextPage: number,
+      current: Filter,
+      size: number = DEFAULT_PAGE_SIZE,
+      adv: TaskDateFilters = {},
+    ) => {
     setLoading(true);
     setError(null);
     try {
       const result = await listTasks({
         status: current === "ALL" ? undefined : current,
         page: nextPage,
-        size: PAGE_SIZE,
+        size,
+        ...adv,
       });
       setTasks(result.content);
       setPageMeta(result.pagination);
@@ -63,12 +75,12 @@ export default function MyTasksPage() {
     }
   }, []);
 
-  // Initial load (state set post-await, so no synchronous setState in effect).
+  // Initial load.
   React.useEffect(() => {
     let active = true;
     (async () => {
       try {
-        const result = await listTasks({ page: 0, size: PAGE_SIZE });
+        const result = await listTasks({ page: 0, size: DEFAULT_PAGE_SIZE });
         if (active) {
           setTasks(result.content);
           setPageMeta(result.pagination);
@@ -89,12 +101,11 @@ export default function MyTasksPage() {
   }, []);
 
   const reload = React.useCallback(
-    () => load(page, filter),
-    [load, page, filter],
+    () => load(page, filter, pageSize, advanced),
+    [load, page, filter, pageSize, advanced],
   );
 
-  // Replace an updated task in place; drop it if it no longer matches the
-  // active status filter (e.g. status changed away from the filtered value).
+  // Patch task in place; drop it if it no longer matches the active filter.
   const patch = React.useCallback(
     (task: Task) => {
       setTasks((prev) => {
@@ -112,8 +123,7 @@ export default function MyTasksPage() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Real-time (also covers other tabs/devices): reflect edits/deletes to tasks
-  // on the current page. New tasks show on refetch / next page.
+  // Real-time: reflect edits/deletes on the current page (new tasks show on refetch).
   const onStreamEvent = React.useCallback(
     (event: TaskEvent) => {
       if (event.type === "DELETED") remove(event.taskId);
@@ -126,12 +136,24 @@ export default function MyTasksPage() {
   function changeFilter(next: Filter) {
     setFilter(next);
     setPage(0);
-    void load(0, next);
+    void load(0, next, pageSize, advanced);
   }
 
   function goToPage(next: number) {
     setPage(next);
-    void load(next, filter);
+    void load(next, filter, pageSize, advanced);
+  }
+
+  function changePageSize(next: number) {
+    setPageSize(next);
+    setPage(0);
+    void load(0, filter, next, advanced);
+  }
+
+  function applyFilters(next: TaskDateFilters) {
+    setAdvanced(next);
+    setPage(0);
+    void load(0, filter, pageSize, next);
   }
 
   function openCreate(status: TaskStatus) {
@@ -145,8 +167,7 @@ export default function MyTasksPage() {
     setSheetOpen(true);
   }
 
-  // After save: edits patch in place; a newly created task may belong on
-  // another page, so reload the current page to keep counts/pages correct.
+  // After save: patch edits in place; reload on create to keep paging correct.
   function handleSaved(task: Task) {
     if (editing) patch(task);
     else void reload();
@@ -190,6 +211,8 @@ export default function MyTasksPage() {
         </div>
       </div>
 
+      <TaskFilters onApply={applyFilters} />
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Spinner className="size-6 text-muted-foreground" />
@@ -212,31 +235,55 @@ export default function MyTasksPage() {
             onDeleted={remove}
           />
 
-          {pageMeta && pageMeta.totalPages > 1 && (
-            <div className="flex items-center justify-between border-t pt-3">
-              <p className="text-xs text-muted-foreground">
-                Page {pageMeta.currentPage + 1} of {pageMeta.totalPages}
-              </p>
+          {tasks.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!pageMeta.hasPrevious}
-                  onClick={() => goToPage(page - 1)}
+                <span className="text-xs text-muted-foreground">Per page</span>
+                <Select
+                  value={String(pageSize)}
+                  onValueChange={(value) =>
+                    changePageSize(Number(value ?? DEFAULT_PAGE_SIZE))
+                  }
                 >
-                  <ChevronLeft />
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!pageMeta.hasNext}
-                  onClick={() => goToPage(page + 1)}
-                >
-                  Next
-                  <ChevronRight />
-                </Button>
+                  <SelectTrigger aria-label="Tasks per page" className="h-8 w-20">
+                    <SelectValue>{pageSize}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAGE_SIZE_OPTIONS.map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Always shown; prev/next disable themselves on the only page. */}
+              {pageMeta && (
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    Page {pageMeta.currentPage + 1} of {pageMeta.totalPages}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pageMeta.hasPrevious}
+                    onClick={() => goToPage(page - 1)}
+                  >
+                    <ChevronLeft />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!pageMeta.hasNext}
+                    onClick={() => goToPage(page + 1)}
+                  >
+                    Next
+                    <ChevronRight />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </>

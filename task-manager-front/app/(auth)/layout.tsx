@@ -1,10 +1,6 @@
 "use client";
 
-/**
- * Public auth shell (login / register). Split-screen: the form sits on the
- * left with the brand mark, a decorative panel fills the right on large
- * screens. Already authenticated users are bounced to the app.
- */
+/** Public auth shell (login/register); redirects authenticated users to the app. */
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";

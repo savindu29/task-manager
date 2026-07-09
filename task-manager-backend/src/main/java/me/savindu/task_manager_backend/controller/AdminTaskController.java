@@ -8,10 +8,15 @@ import me.savindu.task_manager_backend.common.code.SuccessCode;
 import me.savindu.task_manager_backend.common.response.ApiResponse;
 import me.savindu.task_manager_backend.common.response.PaginatedResponse;
 import me.savindu.task_manager_backend.common.response.PaginationRequest;
+import me.savindu.task_manager_backend.dto.TaskFilter;
+import me.savindu.task_manager_backend.dto.TaskHistoryResponse;
 import me.savindu.task_manager_backend.dto.TaskResponse;
 import me.savindu.task_manager_backend.dto.UpdateTaskRequest;
 import me.savindu.task_manager_backend.messaging.TaskStreamService;
 import me.savindu.task_manager_backend.service.TaskService;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-/**
- * Admin task endpoints - view and manage every user's tasks. Access is enforced
- * two ways (defence in depth): the {@code /api/admin/**} URL rule in
- * SecurityConfig and the class-level {@link PreAuthorize} below.
- */
+/** Admin task endpoints for all users' tasks; access enforced by the /api/admin/** rule and class-level @PreAuthorize. */
 @RestController
 @RequestMapping("/api/admin/tasks")
 @RequiredArgsConstructor
@@ -52,8 +53,14 @@ public class AdminTaskController {
     public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> listAll(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long ownerId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant dueFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant dueTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdTo,
             @Valid PaginationRequest pagination) {
-        Page<TaskResponse> page = taskService.getAllTasks(status, ownerId, pagination.toPageable());
+        TaskFilter filter = new TaskFilter(ownerId, status, keyword, dueFrom, dueTo, createdFrom, createdTo);
+        Page<TaskResponse> page = taskService.getAllTasks(filter, pagination.toPageable());
         return ResponseEntity.status(SuccessCode.DATA_RETRIEVED.getStatus())
                 .body(ApiResponse.success(SuccessCode.DATA_RETRIEVED, PaginatedResponse.from(page)));
     }
@@ -80,5 +87,12 @@ public class AdminTaskController {
         taskService.deleteAnyTask(id);
         return ResponseEntity.status(SuccessCode.TASK_DELETED.getStatus())
                 .body(ApiResponse.success(SuccessCode.TASK_DELETED));
+    }
+
+    @Operation(summary = "Get the change history for any task by id")
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<TaskHistoryResponse>>> history(@PathVariable Long id) {
+        return ResponseEntity.status(SuccessCode.DATA_RETRIEVED.getStatus())
+                .body(ApiResponse.success(SuccessCode.DATA_RETRIEVED, taskService.getAnyTaskHistory(id)));
     }
 }

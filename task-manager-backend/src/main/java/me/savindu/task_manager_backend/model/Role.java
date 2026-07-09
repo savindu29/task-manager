@@ -13,11 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Reference table of roles ({@code r_roles}) used for RBAC. {@code code} is the
- * natural key (e.g. USER, ADMIN); Spring Security authorities are derived as
- * "ROLE_" + code.
- */
+/** Reference table of roles (r_roles) for RBAC; authorities are derived as "ROLE_" + code. */
 @Entity
 @Table(
         name = "r_roles",

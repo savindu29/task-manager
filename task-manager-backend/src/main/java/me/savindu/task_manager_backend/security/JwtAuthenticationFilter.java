@@ -15,19 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Reads the JWT on each request and, if valid, populates the
- * {@link SecurityContextHolder}. The token is resolved from, in order:
- * <ol>
- *   <li>the {@code Authorization: Bearer <token>} header (cross-origin clients
- *       such as the Vercel frontend);</li>
- *   <li>the HTTP-only auth cookie (same-origin / local dev);</li>
- *   <li>a {@code token} query parameter (Server-Sent Events: the browser's
- *       EventSource cannot set request headers).</li>
- * </ol>
- * Any problem (missing/expired/tampered token, unknown user) simply leaves the
- * request unauthenticated - downstream authorization then decides.
- */
+/** Per-request JWT filter resolving the token from Bearer header, auth cookie, then token query param; invalid tokens leave the request unauthenticated. */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

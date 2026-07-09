@@ -1,14 +1,4 @@
-/**
- * Edge/server route gate (Next 16 renamed `middleware` -> `proxy`).
- *
- * The auth cookie is set by the backend on ITS OWN domain, so in a split
- * frontend (Vercel) / backend deployment this middleware — running on the
- * frontend domain — cannot see it. Any cookie-presence check here would always
- * read "logged out" and bounce every request to /login. So auth gating is left
- * entirely to the authoritative client guard in app/(dashboard)/layout.tsx
- * (which validates the session against the backend). This only handles the
- * root-path entry redirect.
- */
+/** Route gate (Next 16 renamed `middleware` -> `proxy`); only the root-path redirect — auth gating lives in the client guard. */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 

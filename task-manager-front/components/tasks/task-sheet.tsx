@@ -1,6 +1,12 @@
 "use client";
 
-import { type CreateTaskInput, type Task, type TaskStatus, type UpdateTaskInput } from "@/lib/tasks";
+import {
+  type CreateTaskInput,
+  type Task,
+  type TaskHistoryEntry,
+  type TaskStatus,
+  type UpdateTaskInput,
+} from "@/lib/tasks";
 import { TaskForm } from "@/components/tasks/task-form";
 import {
   Sheet,
@@ -20,6 +26,7 @@ interface TaskSheetProps {
   onSaved: (task: Task) => void;
   createFn?: (input: CreateTaskInput) => Promise<Task>;
   updateFn?: (id: number, input: UpdateTaskInput) => Promise<Task>;
+  historyFn?: (id: number) => Promise<TaskHistoryEntry[]>;
 }
 
 /** Right-hand panel for viewing/editing (or creating) a task. */
@@ -31,6 +38,7 @@ export function TaskSheet({
   onSaved,
   createFn,
   updateFn,
+  historyFn,
 }: TaskSheetProps) {
   const isEdit = Boolean(task);
 
@@ -56,6 +64,7 @@ export function TaskSheet({
             onClose={() => onOpenChange(false)}
             createFn={createFn}
             updateFn={updateFn}
+            historyFn={historyFn}
           />
         )}
       </SheetContent>

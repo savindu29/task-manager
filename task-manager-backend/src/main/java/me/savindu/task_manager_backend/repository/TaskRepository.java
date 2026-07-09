@@ -9,32 +9,34 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
-/**
- * Owner-scoped finders enforce data isolation at the query level: a user's
- * endpoints only ever call {@code findByIdAndOwnerId} or pass their own id to
- * {@link #search}, so one user can never read or mutate another user's task even
- * by guessing an id. {@code @EntityGraph} eagerly loads the owner and status to
- * avoid N+1 selects when mapping to responses.
- */
+/** Owner-scoped finders enforce data isolation at the query level; @EntityGraph eager-loads owner+status to avoid N+1. */
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    /**
-     * Flexible, paginated listing with optional filters. A null {@code ownerId}
-     * means "all owners" (admin); a null {@code statusCode} means "any status".
-     * User endpoints always pass their own id, so the same query safely serves
-     * both roles.
-     */
+    /** Paginated listing; every filter is optional (null = ignored). */
     @EntityGraph(attributePaths = {"owner", "status"})
     @Query("""
             select t from Task t
             where (:ownerId is null or t.owner.id = :ownerId)
               and (:statusCode is null or t.status.code = :statusCode)
+              and (:keyword is null
+                   or lower(t.title) like lower(concat('%', cast(:keyword as string), '%'))
+                   or lower(t.description) like lower(concat('%', cast(:keyword as string), '%')))
+              and t.dueDate >= coalesce(:dueFrom, t.dueDate)
+              and t.dueDate <= coalesce(:dueTo, t.dueDate)
+              and t.createdAt >= coalesce(:createdFrom, t.createdAt)
+              and t.createdAt <= coalesce(:createdTo, t.createdAt)
             """)
     Page<Task> search(@Param("ownerId") Long ownerId,
                       @Param("statusCode") String statusCode,
+                      @Param("keyword") String keyword,
+                      @Param("dueFrom") Instant dueFrom,
+                      @Param("dueTo") Instant dueTo,
+                      @Param("createdFrom") Instant createdFrom,
+                      @Param("createdTo") Instant createdTo,
                       Pageable pageable);
 
     @EntityGraph(attributePaths = {"owner", "status"})

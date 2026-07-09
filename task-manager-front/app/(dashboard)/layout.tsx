@@ -1,11 +1,6 @@
 "use client";
 
-/**
- * Authenticated app shell. Renders the sidebar chrome and guards every route in
- * this group: while auth is resolving we show a spinner, and unauthenticated
- * visitors are redirected to /login. `proxy.ts` does a fast cookie-presence
- * check first; this is the authoritative client-side guard.
- */
+/** Authenticated app shell + client auth guard (redirects to /login). */
 import * as React from "react";
 import { useRouter } from "next/navigation";
 

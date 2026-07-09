@@ -6,11 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-/**
- * Forwards committed task changes to the SSE streams: to the owner's per-user
- * stream and to the admin stream. Runs after commit so rolled-back changes are
- * never pushed.
- */
+/** Forwards committed task changes to the owner and admin SSE streams (after commit only). */
 @Slf4j
 @Component
 @RequiredArgsConstructor

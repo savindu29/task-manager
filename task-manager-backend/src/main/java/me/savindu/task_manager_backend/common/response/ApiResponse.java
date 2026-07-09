@@ -10,11 +10,7 @@ import me.savindu.task_manager_backend.common.code.SuccessCode;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Standard response envelope for every endpoint. {@code success} distinguishes
- * outcomes; {@code code}/{@code message} come from {@link SuccessCode} or
- * {@link ErrorCode}; {@code data} is the payload (null for errors / no-content).
- */
+/** Standard response envelope; success flag, code/message from SuccessCode or ErrorCode, and data payload. */
 @Data
 @Builder
 @NoArgsConstructor

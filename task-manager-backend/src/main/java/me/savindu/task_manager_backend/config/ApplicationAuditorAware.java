@@ -9,12 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Supplies the current auditor (the acting user's id) for Spring Data auditing's
- * {@code @CreatedBy} / {@code @LastModifiedBy} fields. Returns empty for
- * unauthenticated/anonymous requests so those columns stay null (e.g. the very
- * first registration or the bootstrap admin seed).
- */
+/** Supplies the current user id for JPA auditing; empty for unauthenticated/anonymous requests. */
 @Component
 public class ApplicationAuditorAware implements AuditorAware<String> {
 

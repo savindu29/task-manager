@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-// Deterministic avatar colours: the same owner id always maps to the same
-// swatch, so an owner is recognisable at a glance across rows/cards.
+// Deterministic avatar colours: same owner id always maps to the same swatch.
 const OWNER_COLORS = [
   "bg-red-500",
   "bg-orange-500",

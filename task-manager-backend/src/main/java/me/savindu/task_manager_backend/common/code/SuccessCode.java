@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-/**
- * Canonical success catalogue. Mirrors {@link ErrorCode} for successful outcomes
- * so responses carry a stable code + message + HTTP status.
- */
+/** Canonical success catalogue mirroring ErrorCode: code + message + HTTP status. */
 @Getter
 public enum SuccessCode {
 

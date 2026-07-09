@@ -4,10 +4,7 @@ import me.savindu.task_manager_backend.dto.TaskResponse;
 
 import java.time.Instant;
 
-/**
- * Real-time payload delivered to subscribed clients. {@code task} is the current
- * state for CREATED/UPDATED and null for DELETED (only {@code taskId} is set).
- */
+/** Real-time event payload; task is set for CREATED/UPDATED and null for DELETED. */
 public record TaskEvent(
         TaskEventType type,
         Long taskId,
