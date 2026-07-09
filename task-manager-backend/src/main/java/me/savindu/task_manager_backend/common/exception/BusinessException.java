@@ -20,12 +20,6 @@ public class BusinessException extends RuntimeException {
         this.args = args;
     }
 
-    public BusinessException(ErrorCode errorCode, String customMessage, Object... args) {
-        super(customMessage != null ? customMessage : formatMessage(errorCode, args));
-        this.errorCode = errorCode;
-        this.args = args;
-    }
-
     private static String formatMessage(ErrorCode errorCode, Object... args) {
         if (args != null && args.length > 0) {
             return String.format(errorCode.getDefaultMessage(), args);
