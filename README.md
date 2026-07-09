@@ -102,26 +102,42 @@ A full-stack task management application with authentication, role-based access 
 
 ```
 task-manager/
-├── task-manager-backend/      # Spring Boot API
-│   ├── src/main/java/me/savindu/task_manager_backend/
-│   │   ├── controller/        # REST + SSE endpoints
-│   │   ├── service/           # use-cases + authorization
-│   │   ├── repository/        # Spring Data JPA
-│   │   ├── model/             # JPA entities
-│   │   ├── dto/               # request/response records
-│   │   ├── mapper/            # entity ↔ DTO
-│   │   ├── security/          # JWT filter, handlers, cookie service
-│   │   ├── messaging/         # SSE stream + task events
-│   │   ├── config/            # security, CORS, properties, seeders
-│   │   └── common/            # ApiResponse envelope, error/success codes
-│   └── src/main/resources/application.properties
-├── task-manager-front/        # Next.js app
-│   ├── app/(auth)/            # login, register
-│   ├── app/(dashboard)/       # my-task, admin/tasks
-│   ├── components/            # UI + task views
-│   ├── services/              # API call layer
-│   ├── lib/                   # types, axios client, token store
-│   └── hooks/                 # SSE hook, row actions
+├── task-manager-backend/                     # Spring Boot API
+│   ├── src/
+│   │   ├── main/java/me/savindu/task_manager_backend/
+│   │   │   ├── controller/                   # Auth, Task, AdminTask — REST + SSE endpoints
+│   │   │   ├── service/  service/impl/       # use-cases + authorization
+│   │   │   ├── repository/                    # Spring Data JPA repositories
+│   │   │   ├── model/                         # JPA entities (User, Role, Task, status, history)
+│   │   │   ├── dto/                           # request/response records
+│   │   │   ├── mapper/                        # entity ↔ DTO
+│   │   │   ├── security/                      # JWT filter, entry point/handlers, cookie & token services
+│   │   │   ├── messaging/                     # SSE stream service + task events
+│   │   │   ├── config/                        # security, CORS, OpenAPI, properties, data seeders
+│   │   │   ├── constant/                      # role & task-status codes
+│   │   │   └── common/                        # ApiResponse envelope, success/error codes, exception handler
+│   │   ├── main/resources/application.properties
+│   │   └── test/java/...                      # MockMvc + H2 integration tests (auth, task CRUD, RBAC, admin)
+│   ├── Dockerfile  .dockerignore  .env.example
+│   └── pom.xml  mvnw  mvnw.cmd
+├── task-manager-front/                       # Next.js app (App Router)
+│   ├── app/
+│   │   ├── (auth)/                           # login, register (+ split-screen layout, redirect guard)
+│   │   └── (dashboard)/                       # my-task, admin/tasks, project (+ sidebar layout, auth guard)
+│   ├── components/
+│   │   ├── tasks/                            # spreadsheet/board/calendar/timeline views, sheet, form, filters, history
+│   │   ├── ui/                               # shadcn / Base UI primitives
+│   │   └── app-sidebar.tsx  auth-provider.tsx
+│   ├── services/                             # task.service.ts, user.service.ts (axios API layer)
+│   ├── lib/                                  # types, axios client, helpers
+│   ├── hooks/                                # use-task-stream, use-task-row-actions, use-mobile
+│   ├── proxy.ts                              # route gate (Next 16 "middleware")
+│   ├── Dockerfile                            # standalone Next.js production image
+│   └── .env.example  package.json
+├── .github/workflows/ci.yml                  # CI — lint / test / build on push & PR
+├── postman-collection/                       # Postman collection (all endpoints)
+├── Jenkinsfile                               # CD — test → build image → deploy on push to main
+├── .env.example                              # deployment env template (managed DB, injected at deploy)
 └── README.md
 ```
 
