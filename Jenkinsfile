@@ -17,9 +17,6 @@ pipeline {
   environment {
     IMAGE = 'task-manager-backend'
     CONTAINER = 'task-manager-backend'
-    // Names for the throwaway test resources.
-    TEST_DB = 'tm-test-db'
-    TEST_NET = 'tm-test-net'
   }
 
   stages {
@@ -28,42 +25,13 @@ pipeline {
     }
 
     stage('Test') {
+      // Tests run against an in-memory H2 DB (the "test" profile), so no
+      // external database is needed. Build the deps/source image once, run tests in it.
       steps {
         sh '''
-          # Fresh, disposable Postgres just for this test run.
-          docker rm -f $TEST_DB 2>/dev/null || true
-          docker network create $TEST_NET 2>/dev/null || true
-          docker run -d --name $TEST_DB --network $TEST_NET \
-            -e POSTGRES_DB=taskmanager_test \
-            -e POSTGRES_USER=test \
-            -e POSTGRES_PASSWORD=test \
-            postgres:16
-
-          # Wait until it accepts connections.
-          for i in $(seq 1 30); do
-            docker exec $TEST_DB pg_isready -U test -d taskmanager_test && break
-            sleep 2
-          done
-
-          # Build the (source + deps) image and run the tests against the temp DB.
           docker build --target build -t $IMAGE:build ./task-manager-backend
-          docker run --rm --network $TEST_NET \
-            -e DB_URL=jdbc:postgresql://$TEST_DB:5432/taskmanager_test \
-            -e DB_USERNAME=test \
-            -e DB_PASSWORD=test \
-            -e JWT_SECRET=dGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldC0xMjM0NTY3OA== \
-            -e ADMIN_PASSWORD=test12345 \
-            $IMAGE:build mvn -B -ntp test
+          docker run --rm $IMAGE:build mvn -B -ntp test
         '''
-      }
-      post {
-        always {
-          // Always tear down the disposable DB + network.
-          sh '''
-            docker rm -f $TEST_DB 2>/dev/null || true
-            docker network rm $TEST_NET 2>/dev/null || true
-          '''
-        }
       }
     }
 
