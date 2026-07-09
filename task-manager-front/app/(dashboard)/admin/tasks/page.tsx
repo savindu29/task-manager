@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { ApiError } from "@/lib/api";
 import {
   formatStatus,
   TASK_STATUSES,
+  type PageMeta,
   type Task,
   type TaskEvent,
   type TaskStatus,
@@ -21,6 +23,7 @@ import { useAuth } from "@/components/auth-provider";
 import { useTaskStream } from "@/hooks/use-task-stream";
 import { TaskViews } from "@/components/tasks/task-views";
 import { TaskSheet } from "@/components/tasks/task-sheet";
+import { Button } from "@/components/ui/button";
 import {
   Combobox,
   ComboboxContent,
@@ -38,8 +41,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 
-// Fetch a generous page so the grouped views show every user's tasks at once.
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 20;
 
 type StatusFilter = "ALL" | TaskStatus;
 interface Owner {
@@ -52,13 +54,14 @@ export default function AdminTasksPage() {
   const router = useRouter();
 
   const [tasks, setTasks] = React.useState<Task[]>([]);
-  const [total, setTotal] = React.useState(0);
+  const [pageMeta, setPageMeta] = React.useState<PageMeta | null>(null);
   const [owners, setOwners] = React.useState<Map<number, Owner>>(new Map());
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("ALL");
   const [ownerFilter, setOwnerFilter] = React.useState<string>("ALL");
+  const [page, setPage] = React.useState(0);
   const [editing, setEditing] = React.useState<Task | null>(null);
 
   const isAdmin = user?.role === "ADMIN";
@@ -77,17 +80,18 @@ export default function AdminTasksPage() {
   }, []);
 
   const load = React.useCallback(
-    async (status: StatusFilter, ownerId: string) => {
+    async (nextPage: number, status: StatusFilter, ownerId: string) => {
       setLoading(true);
       setError(null);
       try {
         const result = await listAllTasks({
+          page: nextPage,
           size: PAGE_SIZE,
           status: status === "ALL" ? undefined : status,
           ownerId: ownerId === "ALL" ? undefined : Number(ownerId),
         });
         setTasks(result.content);
-        setTotal(result.pagination.totalElements);
+        setPageMeta(result.pagination);
         mergeOwners(result.content);
       } catch (err) {
         setError(
@@ -105,10 +109,10 @@ export default function AdminTasksPage() {
     let active = true;
     (async () => {
       try {
-        const result = await listAllTasks({ size: PAGE_SIZE });
+        const result = await listAllTasks({ page: 0, size: PAGE_SIZE });
         if (!active) return;
         setTasks(result.content);
-        setTotal(result.pagination.totalElements);
+        setPageMeta(result.pagination);
         mergeOwners(result.content);
       } catch (err) {
         if (active) {
@@ -125,15 +129,17 @@ export default function AdminTasksPage() {
     };
   }, [isAdmin, mergeOwners]);
 
-  const upsert = React.useCallback(
+  const patch = React.useCallback(
     (task: Task) => {
       setTasks((prev) => {
-        const without = prev.filter((t) => t.id !== task.id);
+        if (!prev.some((t) => t.id === task.id)) return prev;
         const matchesStatus =
           statusFilter === "ALL" || task.status === statusFilter;
         const matchesOwner =
           ownerFilter === "ALL" || task.ownerId === Number(ownerFilter);
-        return matchesStatus && matchesOwner ? [task, ...without] : without;
+        return matchesStatus && matchesOwner
+          ? prev.map((t) => (t.id === task.id ? task : t))
+          : prev.filter((t) => t.id !== task.id);
       });
     },
     [statusFilter, ownerFilter],
@@ -146,20 +152,27 @@ export default function AdminTasksPage() {
   const onStreamEvent = React.useCallback(
     (event: TaskEvent) => {
       if (event.type === "DELETED") remove(event.taskId);
-      else if (event.task) upsert(event.task);
+      else if (event.task) patch(event.task);
     },
-    [remove, upsert],
+    [remove, patch],
   );
   useTaskStream(onStreamEvent, ADMIN_TASK_STREAM_URL);
 
   function changeStatus(next: StatusFilter) {
     setStatusFilter(next);
-    void load(next, ownerFilter);
+    setPage(0);
+    void load(0, next, ownerFilter);
   }
 
   function changeOwner(next: string) {
     setOwnerFilter(next);
-    void load(statusFilter, next);
+    setPage(0);
+    void load(0, statusFilter, next);
+  }
+
+  function goToPage(next: number) {
+    setPage(next);
+    void load(next, statusFilter, ownerFilter);
   }
 
   const ownerOptions = React.useMemo(
@@ -177,6 +190,7 @@ export default function AdminTasksPage() {
 
   const visibleStatuses =
     statusFilter === "ALL" ? TASK_STATUSES : [statusFilter];
+  const total = pageMeta?.totalElements ?? 0;
 
   if (authStatus !== "authenticated" || !isAdmin) {
     return (
@@ -259,25 +273,61 @@ export default function AdminTasksPage() {
       ) : error ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
           <p className="text-sm text-muted-foreground">{error}</p>
+          <Button
+            variant="outline"
+            onClick={() => load(page, statusFilter, ownerFilter)}
+          >
+            Try again
+          </Button>
         </div>
       ) : (
-        <TaskViews
-          tasks={tasks}
-          statuses={visibleStatuses}
-          onEdit={setEditing}
-          onUpdated={upsert}
-          onDeleted={remove}
-          updateFn={updateAnyTask}
-          deleteFn={deleteAnyTask}
-          showOwner
-        />
+        <>
+          <TaskViews
+            tasks={tasks}
+            statuses={visibleStatuses}
+            onEdit={setEditing}
+            onUpdated={patch}
+            onDeleted={remove}
+            updateFn={updateAnyTask}
+            deleteFn={deleteAnyTask}
+            showOwner
+          />
+
+          {pageMeta && pageMeta.totalPages > 1 && (
+            <div className="flex items-center justify-between border-t pt-3">
+              <p className="text-xs text-muted-foreground">
+                Page {pageMeta.currentPage + 1} of {pageMeta.totalPages}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!pageMeta.hasPrevious}
+                  onClick={() => goToPage(page - 1)}
+                >
+                  <ChevronLeft />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!pageMeta.hasNext}
+                  onClick={() => goToPage(page + 1)}
+                >
+                  Next
+                  <ChevronRight />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <TaskSheet
         open={editing !== null}
         onOpenChange={(open) => !open && setEditing(null)}
         task={editing}
-        onSaved={upsert}
+        onSaved={patch}
         updateFn={updateAnyTask}
       />
     </div>
