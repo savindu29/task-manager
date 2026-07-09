@@ -13,6 +13,8 @@ WORKDIR /app
 # NEXT_PUBLIC_* is inlined at BUILD time; pass with --build-arg.
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Enables `output: "standalone"` in next.config.ts (Docker only, not Vercel).
+ENV DOCKER_BUILD=1
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
