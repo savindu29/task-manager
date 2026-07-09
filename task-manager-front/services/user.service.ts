@@ -1,13 +1,4 @@
-/**
- * User/auth API calls. Maps 1:1 to the backend `/api/auth/*` endpoints. Each
- * call returns the unwrapped payload or throws {@link ApiError} (see lib/api).
- *
- * Auth state lives in an HTTP-only cookie the browser manages, so these
- * functions don't return or accept tokens — success is signalled by the cookie
- * the backend sets, and identity is read back via {@link getCurrentUser}.
- *
- * Types (User, Role, LoginInput, RegisterInput) live in `@/lib/auth`.
- */
+/** User/auth API calls for `/api/auth/*`; each returns the unwrapped payload or throws {@link ApiError}. Types in `@/lib/auth`. */
 import { api } from "@/lib/api";
 import type { AuthResponse, LoginInput, RegisterInput, User } from "@/lib/auth";
 import { clearToken, setToken } from "@/lib/auth-token";

@@ -1,11 +1,4 @@
-/**
- * Auth/user domain types. Maps to the backend `/api/auth/*` contract. The API
- * calls that use these types live in `@/services/user.service`.
- *
- * Auth state lives in an HTTP-only cookie the browser manages, so nothing here
- * carries a token — success is signalled by the cookie the backend sets, and
- * identity is read back via `getCurrentUser` (in the service).
- */
+/** Auth/user domain types for `/api/auth/*`; API calls live in `@/services/user.service`. */
 
 export type Role = "USER" | "ADMIN";
 

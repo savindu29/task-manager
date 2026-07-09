@@ -9,11 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Arrays;
 
-/**
- * Builds the HTTP-only authentication cookie and extracts the token from
- * incoming requests. Centralising cookie flags (HttpOnly / Secure / SameSite)
- * here keeps the security policy in one place.
- */
+/** Builds the HTTP-only auth cookie and extracts the token from requests, centralising cookie flags. */
 @Service
 @RequiredArgsConstructor
 public class CookieService {

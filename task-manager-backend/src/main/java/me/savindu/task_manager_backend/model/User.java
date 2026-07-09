@@ -18,12 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Application user. Emails are stored lower-cased and are unique. The
- * {@code password} column holds a BCrypt hash - never a plaintext password.
- * {@code role} is a FK to the {@code r_roles} reference table. Timestamps and
- * auditor columns are populated by {@link BaseAuditEntity}.
- */
+/** Application user; emails lower-cased and unique, password is a BCrypt hash, role is a FK to r_roles. */
 @Entity
 @Table(
         name = "m_users",

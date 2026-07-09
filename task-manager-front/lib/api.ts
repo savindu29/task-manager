@@ -1,16 +1,4 @@
-/**
- * Thin, typed client for the task-manager backend, built on axios.
- *
- * The backend authenticates via an HTTP-only JWT cookie, so the browser sends
- * and receives it automatically — we never read or store the token in JS. The
- * axios instance sets `withCredentials: true` so the cookie travels cross-origin
- * (the backend enables CORS `allowCredentials`).
- *
- * Responses are wrapped in a standard envelope (see backend `ApiResponse`):
- *   { success, code, message, timestamp, data }
- * A response interceptor unwraps `data` on success and throws a typed
- * `ApiError` otherwise, so callers can `try/catch` uniformly.
- */
+/** Typed axios client: attaches Bearer token, unwraps the envelope, throws ApiError. */
 import axios, {
   type AxiosError,
   type AxiosInstance,
@@ -30,11 +18,7 @@ export interface ApiEnvelope<T> {
   data: T;
 }
 
-/**
- * Error thrown for any non-2xx response (or transport failure). Carries the
- * backend error `code`/`message` plus per-field validation errors when the
- * backend returns them (INVALID_REQUEST puts `{ field: message }` in `data`).
- */
+/** Error for any non-2xx/transport failure; carries backend code/message and per-field validation errors. */
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
@@ -79,8 +63,7 @@ const client: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach the JWT as a Bearer header when we have one. This is the primary auth
-// mechanism cross-origin; the cookie (withCredentials) still works same-origin.
+// Attach the JWT as a Bearer header when present (primary cross-origin auth).
 client.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
@@ -124,10 +107,7 @@ export type RequestOptions = Omit<
   "url" | "method" | "data" | "baseURL"
 >;
 
-/**
- * Perform a request against the API and return the unwrapped `data` payload.
- * Throws {@link ApiError} on any error so callers can `try/catch` uniformly.
- */
+/** Perform a request and return the unwrapped `data`; throws {@link ApiError} on any error. */
 export async function request<T>(config: AxiosRequestConfig): Promise<T> {
   const response = await client.request<T>(config);
   return response.data as T;

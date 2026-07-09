@@ -1,8 +1,4 @@
-/**
- * Task domain types and UI helpers, shared by the USER and ADMIN task views.
- * Maps to the `/api/tasks/*` and `/api/admin/tasks/*` contracts. The API calls
- * that use these types live in `@/services/task.service`.
- */
+/** Task domain types and UI helpers shared by USER/ADMIN views; API calls in `@/services/task.service`. */
 
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -15,11 +11,7 @@ export const STATUS_META: Record<TaskStatus, { dot: string; pill: string }> = {
   DONE: { dot: "bg-emerald-500", pill: "bg-emerald-100 text-emerald-700" },
 };
 
-/**
- * Human-friendly label for a status code: drops underscores and sentence-cases
- * it, e.g. "IN_PROGRESS" -> "In progress". Use this everywhere a status is
- * shown so display stays consistent.
- */
+/** Human-friendly status label, e.g. "IN_PROGRESS" -> "In progress". */
 export function formatStatus(code: string): string {
   const text = code.replace(/_/g, " ").toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -69,7 +61,16 @@ export interface Paginated<T> {
   pagination: PageMeta;
 }
 
-export interface ListTasksParams {
+/** Keyword + date-range filters (dates are ISO-8601 instants). */
+export interface TaskDateFilters {
+  keyword?: string;
+  dueFrom?: string;
+  dueTo?: string;
+  createdFrom?: string;
+  createdTo?: string;
+}
+
+export interface ListTasksParams extends TaskDateFilters {
   status?: TaskStatus;
   page?: number;
   size?: number;
@@ -90,4 +91,17 @@ export interface TaskEvent {
   taskId: number;
   task: Task | null;
   timestamp: string;
+}
+
+export type TaskHistoryAction = "CREATED" | "UPDATED";
+
+/** One change-history entry. field/oldValue/newValue are null for CREATED. */
+export interface TaskHistoryEntry {
+  id: number;
+  action: TaskHistoryAction;
+  field: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  changedBy: string | null;
+  changedAt: string;
 }

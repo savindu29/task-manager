@@ -3,11 +3,7 @@ package me.savindu.task_manager_backend.exception;
 import lombok.Getter;
 import me.savindu.task_manager_backend.code.ErrorCode;
 
-/**
- * Application-level exception carrying an {@link ErrorCode}. The global handler
- * maps the code to an HTTP status and an {@code ApiResponse.error(...)} body.
- * Optional {@code args} fill {@code %s} placeholders in the code's default message.
- */
+/** App exception carrying an ErrorCode; global handler maps it to HTTP status + body, args fill %s placeholders. */
 @Getter
 public class BusinessException extends RuntimeException {
 

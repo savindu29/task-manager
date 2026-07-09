@@ -1,5 +1,6 @@
 package me.savindu.task_manager_backend.config;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import me.savindu.task_manager_backend.security.CustomUserDetailsService;
 import me.savindu.task_manager_backend.security.JwtAuthenticationFilter;
@@ -24,22 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-/**
- * Central security configuration.
- *
- * <p>Design notes:
- * <ul>
- *   <li>Stateless: no HTTP session; identity comes from the JWT in an
- *       HTTP-only cookie, validated per request by {@link JwtAuthenticationFilter}.</li>
- *   <li>CSRF is disabled because the API is token-based and stateless. The auth
- *       cookie's {@code SameSite} attribute (see application.properties) is the
- *       primary CSRF mitigation. If you later serve a cross-site browser client
- *       with SameSite=None, re-enable CSRF protection (e.g. double-submit token).</li>
- *   <li>RBAC: {@code /api/admin/**} requires ADMIN; other endpoints require an
- *       authenticated user; {@code @EnableMethodSecurity} also allows
- *       {@code @PreAuthorize} on service/controller methods.</li>
- * </ul>
- */
+/** Central security config: stateless JWT-cookie auth, CSRF disabled (SameSite mitigates), RBAC with admin routes and method security. */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -69,6 +55,10 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Internal servlet re-dispatches (e.g. the SSE stream's async
+                        // completion) — the original request was already authorized, so
+                        // don't re-check and error on the committed response.
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -105,7 +95,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(corsProperties.allowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        // Required so the browser sends/receives the HTTP-only auth cookie cross-origin.
+        // Needed to send/receive the auth cookie cross-origin.
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

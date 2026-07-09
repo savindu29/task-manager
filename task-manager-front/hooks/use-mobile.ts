@@ -8,11 +8,7 @@ function subscribe(onChange: () => void) {
   return () => mql.removeEventListener("change", onChange)
 }
 
-/**
- * True on viewports narrower than the mobile breakpoint. Uses
- * `useSyncExternalStore` to subscribe to the media query without setting state
- * inside an effect.
- */
+/** True on viewports narrower than the mobile breakpoint (via useSyncExternalStore). */
 export function useIsMobile() {
   return React.useSyncExternalStore(
     subscribe,

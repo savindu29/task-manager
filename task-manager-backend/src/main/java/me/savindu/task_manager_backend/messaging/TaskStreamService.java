@@ -11,19 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * Registry of Server-Sent Events connections for real-time task updates.
- *
- * <p>Two audiences are tracked:
- * <ul>
- *   <li>per-owner emitters (keyed by user id) - a user receives changes to their
- *       own tasks only;</li>
- *   <li>admin emitters - receive every task change.</li>
- * </ul>
- * A user may hold several connections (multiple tabs), so each key maps to a set.
- * SSE is one-directional (server to client); clients still perform all writes via
- * the REST API.
- */
+/** Registry of SSE connections for real-time task updates: per-owner (own tasks) and admin (all tasks). */
 @Slf4j
 @Service
 public class TaskStreamService {

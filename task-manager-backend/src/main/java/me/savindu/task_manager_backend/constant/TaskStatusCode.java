@@ -1,9 +1,6 @@
 package me.savindu.task_manager_backend.constant;
 
-/**
- * Well-known task-status codes (the natural keys of the {@code r_task_statuses}
- * reference table).
- */
+/** Well-known task-status codes (natural keys of r_task_statuses). */
 public final class TaskStatusCode {
 
     public static final String TODO = "TODO";

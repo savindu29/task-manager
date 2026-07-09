@@ -1,11 +1,7 @@
-/**
- * Admin task types and constants. Maps to `/api/admin/tasks/*` (role ADMIN —
- * the backend enforces this; the frontend also gates the UI). The API calls
- * that use these live in `@/services/task.service`.
- */
-import type { TaskStatus } from "@/lib/tasks";
+/** Admin task types/constants for `/api/admin/tasks/*` (backend enforces ADMIN role). */
+import type { TaskDateFilters, TaskStatus } from "@/lib/tasks";
 
-export interface ListAllTasksParams {
+export interface ListAllTasksParams extends TaskDateFilters {
   status?: TaskStatus;
   ownerId?: number;
   page?: number;

@@ -1,20 +1,11 @@
-/**
- * Task API calls. Two scopes:
- *   - USER  — `/api/tasks/*`, scoped server-side to the caller's own tasks
- *             (owner comes from the auth principal, never the client);
- *   - ADMIN — `/api/admin/tasks/*`, view/manage every user's tasks (the backend
- *             enforces the role; the frontend also gates the UI).
- *
- * Each call returns the unwrapped payload or throws {@link ApiError}. Types and
- * UI helpers live in `@/lib/tasks` (and `ListAllTasksParams` in
- * `@/lib/admin-tasks`); the SSE stream URLs live alongside those types.
- */
+/** Task API calls for USER (`/api/tasks/*`) and ADMIN (`/api/admin/tasks/*`) scopes; types live in `@/lib/tasks`. */
 import { api } from "@/lib/api";
 import type {
   CreateTaskInput,
   ListTasksParams,
   Paginated,
   Task,
+  TaskHistoryEntry,
   UpdateTaskInput,
 } from "@/lib/tasks";
 import type { ListAllTasksParams } from "@/lib/admin-tasks";
@@ -23,11 +14,7 @@ import type { ListAllTasksParams } from "@/lib/admin-tasks";
 // USER — own tasks only
 // ============================================================
 
-/**
- * Paginated list of the current user's tasks, optionally filtered by status.
- * axios serialises `params` into the query string and omits null/undefined
- * values, so unset filters simply don't appear.
- */
+/** Paginated list of the current user's tasks, optionally filtered by status. */
 export function listTasks(
   params: ListTasksParams = {},
 ): Promise<Paginated<Task>> {
@@ -48,6 +35,11 @@ export function updateTask(id: number, input: UpdateTaskInput): Promise<Task> {
 
 export function deleteTask(id: number): Promise<void> {
   return api.delete<void>(`/api/tasks/${id}`);
+}
+
+/** Change history for one of the current user's tasks (newest first). */
+export function getTaskHistory(id: number): Promise<TaskHistoryEntry[]> {
+  return api.get<TaskHistoryEntry[]>(`/api/tasks/${id}/history`);
 }
 
 // ============================================================
@@ -74,4 +66,9 @@ export function updateAnyTask(
 
 export function deleteAnyTask(id: number): Promise<void> {
   return api.delete<void>(`/api/admin/tasks/${id}`);
+}
+
+/** Change history for any task (admin scope, newest first). */
+export function getAnyTaskHistory(id: number): Promise<TaskHistoryEntry[]> {
+  return api.get<TaskHistoryEntry[]>(`/api/admin/tasks/${id}/history`);
 }

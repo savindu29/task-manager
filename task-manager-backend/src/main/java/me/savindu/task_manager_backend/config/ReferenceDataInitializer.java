@@ -12,12 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * Seeds the reference tables ({@code r_roles}, {@code r_task_statuses}) on
- * startup. Runs before {@link DataInitializer} (which needs the ADMIN role to
- * exist) via {@link Order}. Idempotent: each row is inserted only if its code
- * is not already present.
- */
+/** Idempotently seeds the role and task-status reference tables on startup, before DataInitializer. */
 @Slf4j
 @Component
 @Order(1)

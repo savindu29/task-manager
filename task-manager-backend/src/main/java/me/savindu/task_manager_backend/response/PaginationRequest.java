@@ -14,11 +14,7 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Bindable pagination/sort/search request. Defaults are applied null-safely in
- * {@link #toPageable()} so it works both via the builder and via query-parameter
- * binding (where Lombok's no-args constructor leaves builder defaults unset).
- */
+/** Bindable pagination/sort/search request; defaults applied null-safely in toPageable(). */
 @Data
 @Builder
 @NoArgsConstructor

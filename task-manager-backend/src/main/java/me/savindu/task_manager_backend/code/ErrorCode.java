@@ -3,12 +3,7 @@ package me.savindu.task_manager_backend.code;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-/**
- * Canonical error catalogue. Each entry carries a stable machine-readable
- * {@code code}, a human-readable default message (may contain {@code %s}
- * placeholders filled by {@code BusinessException} args), and the HTTP status
- * the global handler responds with.
- */
+/** Canonical error catalogue: stable code, default message (with %s args), and HTTP status. */
 @Getter
 public enum ErrorCode {
 

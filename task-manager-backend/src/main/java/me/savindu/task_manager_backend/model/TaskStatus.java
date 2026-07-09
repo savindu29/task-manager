@@ -13,10 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Reference table of task lifecycle states ({@code r_task_statuses}).
- * {@code code} is the natural key (e.g. TODO, IN_PROGRESS, DONE).
- */
+/** Reference table of task lifecycle states (r_task_statuses); code is the natural key. */
 @Entity
 @Table(
         name = "r_task_statuses",

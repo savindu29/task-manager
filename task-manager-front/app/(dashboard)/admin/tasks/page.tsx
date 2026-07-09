@@ -10,6 +10,7 @@ import {
   TASK_STATUSES,
   type PageMeta,
   type Task,
+  type TaskDateFilters,
   type TaskEvent,
   type TaskStatus,
 } from "@/lib/tasks";
@@ -18,10 +19,12 @@ import {
   listAllTasks,
   updateAnyTask,
   deleteAnyTask,
+  getAnyTaskHistory,
 } from "@/services/task.service";
 import { useAuth } from "@/components/auth-provider";
 import { useTaskStream } from "@/hooks/use-task-stream";
 import { TaskViews } from "@/components/tasks/task-views";
+import { TaskFilters } from "@/components/tasks/task-filters";
 import { TaskSheet } from "@/components/tasks/task-sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +64,7 @@ export default function AdminTasksPage() {
 
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("ALL");
   const [ownerFilter, setOwnerFilter] = React.useState<string>("ALL");
+  const [advanced, setAdvanced] = React.useState<TaskDateFilters>({});
   const [page, setPage] = React.useState(0);
   const [editing, setEditing] = React.useState<Task | null>(null);
 
@@ -80,7 +84,12 @@ export default function AdminTasksPage() {
   }, []);
 
   const load = React.useCallback(
-    async (nextPage: number, status: StatusFilter, ownerId: string) => {
+    async (
+      nextPage: number,
+      status: StatusFilter,
+      ownerId: string,
+      adv: TaskDateFilters = {},
+    ) => {
       setLoading(true);
       setError(null);
       try {
@@ -89,6 +98,7 @@ export default function AdminTasksPage() {
           size: PAGE_SIZE,
           status: status === "ALL" ? undefined : status,
           ownerId: ownerId === "ALL" ? undefined : Number(ownerId),
+          ...adv,
         });
         setTasks(result.content);
         setPageMeta(result.pagination);
@@ -161,18 +171,24 @@ export default function AdminTasksPage() {
   function changeStatus(next: StatusFilter) {
     setStatusFilter(next);
     setPage(0);
-    void load(0, next, ownerFilter);
+    void load(0, next, ownerFilter, advanced);
   }
 
   function changeOwner(next: string) {
     setOwnerFilter(next);
     setPage(0);
-    void load(0, statusFilter, next);
+    void load(0, statusFilter, next, advanced);
   }
 
   function goToPage(next: number) {
     setPage(next);
-    void load(next, statusFilter, ownerFilter);
+    void load(next, statusFilter, ownerFilter, advanced);
+  }
+
+  function applyFilters(next: TaskDateFilters) {
+    setAdvanced(next);
+    setPage(0);
+    void load(0, statusFilter, ownerFilter, next);
   }
 
   const ownerOptions = React.useMemo(
@@ -266,6 +282,8 @@ export default function AdminTasksPage() {
         </div>
       </div>
 
+      <TaskFilters onApply={applyFilters} />
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Spinner className="size-6 text-muted-foreground" />
@@ -275,7 +293,7 @@ export default function AdminTasksPage() {
           <p className="text-sm text-muted-foreground">{error}</p>
           <Button
             variant="outline"
-            onClick={() => load(page, statusFilter, ownerFilter)}
+            onClick={() => load(page, statusFilter, ownerFilter, advanced)}
           >
             Try again
           </Button>
@@ -329,6 +347,7 @@ export default function AdminTasksPage() {
         task={editing}
         onSaved={patch}
         updateFn={updateAnyTask}
+        historyFn={getAnyTaskHistory}
       />
     </div>
   );

@@ -11,12 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * OpenAPI / Swagger UI metadata. Declares the HTTP-only cookie as the security
- * scheme so the generated docs describe how the API is authenticated. Swagger UI
- * itself cannot set an HttpOnly cookie via JavaScript, but when called same-origin
- * the browser will attach the cookie automatically after /api/auth/login.
- */
+/** OpenAPI / Swagger UI metadata; declares the HTTP-only auth cookie as the security scheme. */
 @Configuration
 @RequiredArgsConstructor
 public class OpenApiConfig {
