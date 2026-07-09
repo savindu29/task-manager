@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,10 +16,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Reads the JWT from the HTTP-only auth cookie on each request and, if valid,
- * populates the {@link SecurityContextHolder}. Any problem (missing/expired/
- * tampered token, unknown user) simply leaves the request unauthenticated -
- * downstream authorization then decides whether that is allowed.
+ * Reads the JWT on each request and, if valid, populates the
+ * {@link SecurityContextHolder}. The token is resolved from, in order:
+ * <ol>
+ *   <li>the {@code Authorization: Bearer <token>} header (cross-origin clients
+ *       such as the Vercel frontend);</li>
+ *   <li>the HTTP-only auth cookie (same-origin / local dev);</li>
+ *   <li>a {@code token} query parameter (Server-Sent Events: the browser's
+ *       EventSource cannot set request headers).</li>
+ * </ol>
+ * Any problem (missing/expired/tampered token, unknown user) simply leaves the
+ * request unauthenticated - downstream authorization then decides.
  */
 @Component
 @RequiredArgsConstructor
@@ -35,13 +43,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String token = cookieService.extractToken(request);
+        String token = resolveToken(request);
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             authenticate(request, token);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /** Header (Bearer) -> cookie -> query param. First non-blank wins. */
+    private String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header != null && header.startsWith("Bearer ")) {
+            String bearer = header.substring(7).trim();
+            if (!bearer.isBlank()) {
+                return bearer;
+            }
+        }
+
+        String cookieToken = cookieService.extractToken(request);
+        if (cookieToken != null) {
+            return cookieToken;
+        }
+
+        String param = request.getParameter("token");
+        if (param != null && !param.isBlank()) {
+            return param;
+        }
+
+        return null;
     }
 
     private void authenticate(HttpServletRequest request, String token) {
