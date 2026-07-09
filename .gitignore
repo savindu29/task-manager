@@ -5,3 +5,6 @@ prod.env
 test.env
 *.env
 !.env.example
+
+# Tooling
+.claude/
