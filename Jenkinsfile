@@ -79,8 +79,10 @@ pipeline {
       steps {
         withCredentials([file(credentialsId: 'task-manager-env', variable: 'ENV_FILE')]) {
           sh '''
+            # Shared network with Caddy so it can reach this container by name.
+            docker network create web 2>/dev/null || true
             docker rm -f $CONTAINER 2>/dev/null || true
-            docker run -d --name $CONTAINER --restart unless-stopped \
+            docker run -d --name $CONTAINER --network web --restart unless-stopped \
               --env-file "$ENV_FILE" \
               -p 8081:5000 \
               $IMAGE:latest
