@@ -1,41 +1,24 @@
 /**
  * Edge/server route gate (Next 16 renamed `middleware` -> `proxy`).
  *
- * This is a *fast, coarse* check based only on the presence of the auth cookie
- * — it does NOT validate the JWT (that's the backend's job, plus the
- * authoritative client guard in app/(dashboard)/layout.tsx). Its purpose is to
- * avoid rendering the app shell for obviously-unauthenticated visitors and to
- * keep logged-in users off the login/register pages.
+ * The auth cookie is set by the backend on ITS OWN domain, so in a split
+ * frontend (Vercel) / backend deployment this middleware — running on the
+ * frontend domain — cannot see it. Any cookie-presence check here would always
+ * read "logged out" and bounce every request to /login. So auth gating is left
+ * entirely to the authoritative client guard in app/(dashboard)/layout.tsx
+ * (which validates the session against the backend). This only handles the
+ * root-path entry redirect.
  */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? "access_token";
-const AUTH_ROUTES = ["/login", "/register"];
-
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasSession = request.cookies.has(AUTH_COOKIE_NAME);
-  const isAuthRoute = AUTH_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
 
-  // There is no dashboard route: the app home is /my-task.
+  // No dashboard index route: send the app home to /my-task. If the visitor
+  // isn't actually authenticated, the client guard redirects them to /login.
   if (pathname === "/") {
-    return NextResponse.redirect(
-      new URL(hasSession ? "/my-task" : "/login", request.url),
-    );
-  }
-
-  // Signed-in users shouldn't see the auth pages.
-  if (hasSession && isAuthRoute) {
     return NextResponse.redirect(new URL("/my-task", request.url));
-  }
-
-  // Everything else in scope is app content: require a session cookie.
-  if (!hasSession && !isAuthRoute) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
