@@ -2,8 +2,6 @@
 
 A full-stack task management application with authentication, role-based access control, real-time updates, filtering, pagination, and a per-task change history. Built as a monorepo with a **Spring Boot** backend, a **Next.js** frontend, and **PostgreSQL** persistence.
 
-> Submitted for the *Software Engineer (Full Stack – Backend Focused)* take-home assignment.
-
 ---
 
 ## Table of contents
@@ -27,7 +25,7 @@ A full-stack task management application with authentication, role-based access 
 - [Deployment](#deployment)
 - [Design decisions](#design-decisions)
 - [Assumptions](#assumptions)
-- [Remaining work & future improvements](#remaining-work--future-improvements)
+- [Future improvements](#future-improvements)
 
 ---
 
@@ -69,8 +67,12 @@ A full-stack task management application with authentication, role-based access 
 | Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, axios |
 | Database | PostgreSQL (Neon in production) |
 | Realtime | Server-Sent Events (`SseEmitter` / `EventSource`) |
-| Docs | springdoc-openapi (Swagger UI) |
+| Docs | springdoc-openapi (Swagger UI), Postman collection |
 | Build | Maven (backend), pnpm (frontend) |
+| Testing | JUnit 5, Spring Boot Test, MockMvc, H2 |
+| CI / CD | GitHub Actions (CI), Jenkins (CD) |
+| Containerization | Docker |
+| Hosting | AWS EC2 + Caddy (backend), Vercel (frontend), Neon (database) |
 
 ---
 
@@ -249,7 +251,7 @@ All responses use a consistent envelope:
 **List query parameters** (`GET /api/tasks` and `/api/admin/tasks`):
 `status`, `ownerId` (admin), `keyword`, `dueFrom`, `dueTo`, `createdFrom`, `createdTo` (ISO-8601), `page`, `size`, `sortBy`, `sortDirection`.
 
-Interactive docs are available at `/swagger-ui/index.html`. A **Postman collection + environment** are provided in [`docs/postman/`](docs/postman) *(see Remaining work if not yet present)*.
+Interactive docs are available at `/swagger-ui/index.html`. A **Postman collection** covering every endpoint is in [`postman-collection/`](postman-collection) — import it and set a `baseUrl` variable to try the API.
 
 ---
 
@@ -290,23 +292,28 @@ pnpm exec tsc --noEmit
 
 ## CI/CD
 
-- **Continuous Deployment** is handled by a **Jenkins** pipeline (`Jenkinsfile`) that, on each push to `main`, runs backend tests against a disposable PostgreSQL container, builds the Docker image, and redeploys the backend.
-- A **GitHub Actions** workflow (install → lint → test on push and pull request) is the outstanding CI item — see [Remaining work](#remaining-work--future-improvements).
+- **CI — GitHub Actions** (`.github/workflows/ci.yml`): on every **push and pull request**, installs dependencies, runs the backend test suite (H2), and lints, type-checks and builds the frontend.
+- **CD — Jenkins** (`Jenkinsfile`): on push to `main`, runs the backend tests, builds the Docker image, and redeploys the backend container on the EC2 host.
 
 ---
 
 ## Deployment
 
-The application is deployed as:
-- **Frontend** → Vercel (auto-deploys on push).
-- **Backend** → a Dockerised Spring Boot container on a Linux host behind **Caddy** (automatic HTTPS), connected to **Neon** PostgreSQL.
-- Because `NEXT_PUBLIC_API_URL` is inlined at build time, the frontend is built pointing at the deployed API's HTTPS URL, and the backend allows that origin via CORS with `SameSite=None; Secure` cookies / Bearer tokens.
+| Component | Where / how |
+|---|---|
+| Frontend | **Vercel** — auto-deploys on push; `NEXT_PUBLIC_API_URL` points at the API's HTTPS URL |
+| Backend | **Docker** container on **AWS EC2**, behind **Caddy** (automatic HTTPS) |
+| Database | **Neon** (managed PostgreSQL) |
+| CI | **GitHub Actions** — lint, type-check, test on every push / PR |
+| CD | **Jenkins** (on the EC2) — test → build image → redeploy on push to `main` |
+
+Because `NEXT_PUBLIC_API_URL` is inlined at build time, the frontend is built pointing at the deployed API's HTTPS URL; the backend allows that origin via CORS with Bearer-token / `SameSite=None; Secure` cookie auth.
 
 ---
 
 ## Design decisions
 
-- **Monorepo** (`task-manager-backend` + `task-manager-front`) for a single, reviewable submission.
+- **Monorepo** (`task-manager-backend` + `task-manager-front`) keeps the backend and frontend in one place.
 - **JWT (stateless)** over server sessions — simpler horizontal scaling; token returned in the body **and** cookie so the app works both same-origin and cross-origin.
 - **SSE** over WebSockets for real-time — updates are one-directional (server → client) and SSE is simpler, auto-reconnects, and rides over plain HTTP; all writes still go through REST.
 - **After-commit events** for real-time so clients are never notified of rolled-back changes.
@@ -322,21 +329,15 @@ The application is deployed as:
 - A single bootstrap admin is seeded on startup; additional admins are promoted directly in the database.
 - Task status is a fixed reference set: `TODO`, `IN_PROGRESS`, `DONE`.
 - Dates are stored/transferred as ISO-8601 instants (UTC).
-- `JPA_DDL_AUTO=update` manages the schema for this assignment; a migration tool would be used in production.
+- `JPA_DDL_AUTO=update` manages the schema in development; a migration tool would be used in production.
 - One user role per account (`USER` or `ADMIN`).
 
 ---
 
-## Remaining work & future improvements
+## Future improvements
 
-**Remaining (to fully satisfy the brief):**
-- **GitHub Actions CI** — a `.github/workflows/ci.yml` running install → lint → test for both apps on push and pull request.
-- **Postman collection & environment** — export covering every endpoint with a `baseUrl`/token environment, committed under `docs/postman/`.
-
-**Future improvements:**
 - Flyway/Liquibase migrations instead of `ddl-auto`.
 - Refresh tokens + token rotation.
 - Full-text search and saved filters.
 - Rate limiting and audit logging.
 - Historical metrics/dashboards for tasks.
-```
