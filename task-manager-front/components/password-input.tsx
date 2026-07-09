@@ -6,10 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
-/**
- * Password input with a show/hide toggle. Forwards all native input props to
- * the underlying <Input>; the `type` is controlled internally by the toggle.
- */
+/** Password input with a show/hide toggle; forwards native props to <Input>. */
 function PasswordInput({
   className,
   ...props

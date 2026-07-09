@@ -8,11 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Adapts a {@link User} entity to Spring Security's {@link UserDetails}, keeping
- * the JPA entity free of framework concerns. The username is the user's email
- * and the single authority is derived as "ROLE_" + role.
- */
+/** Adapts a User entity to Spring Security's UserDetails; username is the email, authority is "ROLE_" + role. */
 public class AppUserDetails implements UserDetails {
 
     private final User user;

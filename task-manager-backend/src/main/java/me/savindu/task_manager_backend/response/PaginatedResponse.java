@@ -14,10 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Envelope for paginated collections: content plus pagination, sort and
- * response metadata. Build from a Spring Data {@link Page} via {@link #from}.
- */
+/** Envelope for paginated collections; build from a Spring Data Page via from(). */
 @Data
 @Builder
 @NoArgsConstructor

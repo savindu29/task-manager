@@ -19,8 +19,7 @@ const VIEW_TABS: { value: View; label: string; icon: React.ElementType }[] = [
   { value: "board", label: "Board", icon: Columns3 },
 ];
 
-/** Tabbed multi-view over the same task set: spreadsheet, timeline, calendar,
- *  board. Used by both the user (/my-task) and admin (/admin/tasks) pages. */
+/** Tabbed multi-view (spreadsheet/timeline/calendar/board) used by /my-task and /admin/tasks. */
 export function TaskViews(props: TaskViewProps) {
   const [view, setView] = React.useState<View>("spreadsheet");
 

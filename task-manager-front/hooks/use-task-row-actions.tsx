@@ -20,8 +20,7 @@ import {
 interface Options {
   onUpdated: (task: Task) => void;
   onDeleted: (id: number) => void;
-  /** Endpoint overrides (default to the current-user endpoints). Admin views
-   *  pass the /api/admin/tasks equivalents. */
+  /** Endpoint overrides; admin views pass the /api/admin/tasks equivalents. */
   updateFn?: (
     id: number,
     input: {
@@ -34,11 +33,7 @@ interface Options {
   deleteFn?: (id: number) => Promise<void>;
 }
 
-/**
- * Shared task-row behaviour reused by every task view (spreadsheet, board,
- * calendar, timeline): change status and delete with a confirmation dialog.
- * Returns the confirm dialog element to render once.
- */
+/** Shared task-row actions (change status, delete-with-confirm); returns the dialog to render once. */
 export function useTaskRowActions({
   onUpdated,
   onDeleted,

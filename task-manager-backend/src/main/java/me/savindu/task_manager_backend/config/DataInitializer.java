@@ -12,12 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/**
- * Seeds a single ADMIN account on startup if it does not already exist, so the
- * system is usable out of the box. Credentials come from {@code app.admin.*}
- * (override via ADMIN_EMAIL / ADMIN_PASSWORD env vars). Runs after
- * {@link ReferenceDataInitializer} so the ADMIN role is available.
- */
+/** Seeds the bootstrap ADMIN account (from app.admin.*) on startup if absent, after ReferenceDataInitializer. */
 @Slf4j
 @Component
 @Order(2)

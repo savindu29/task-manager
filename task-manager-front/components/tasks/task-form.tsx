@@ -9,10 +9,12 @@ import {
   TASK_STATUSES,
   type CreateTaskInput,
   type Task,
+  type TaskHistoryEntry,
   type TaskStatus,
   type UpdateTaskInput,
 } from "@/lib/tasks";
 import { createTask, updateTask } from "@/services/task.service";
+import { TaskHistory } from "@/components/tasks/task-history";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -40,13 +42,10 @@ export interface TaskFormProps {
   onClose: () => void;
   createFn?: (input: CreateTaskInput) => Promise<Task>;
   updateFn?: (id: number, input: UpdateTaskInput) => Promise<Task>;
+  historyFn?: (id: number) => Promise<TaskHistoryEntry[]>;
 }
 
-/**
- * Create/edit task form. Presentational shell (header/footer chrome) is
- * supplied by the container — here we render the scrollable fields plus a
- * pinned footer with the save/cancel actions.
- */
+/** Create/edit task form: scrollable fields plus a pinned save/cancel footer. */
 export function TaskForm({
   task,
   defaultStatus,
@@ -54,6 +53,7 @@ export function TaskForm({
   onClose,
   createFn = createTask,
   updateFn = updateTask,
+  historyFn,
 }: TaskFormProps) {
   const isEdit = Boolean(task);
 
@@ -169,6 +169,10 @@ export function TaskForm({
           />
           <FieldError errors={[{ message: fieldErrors.dueDate }]} />
         </Field>
+
+        {isEdit && task && (
+          <TaskHistory task={task} fetchHistory={historyFn} />
+        )}
       </form>
 
       <div className="flex justify-end gap-2 border-t p-4">

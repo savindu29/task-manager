@@ -1,13 +1,6 @@
 "use client";
 
-/**
- * Client-side auth state. On mount it resolves the current user from
- * `/api/auth/me` (the browser sends the HTTP-only cookie), so a returning
- * visitor with a valid cookie is recognised without re-login.
- *
- * Consumers use {@link useAuth}. Route protection is handled by the layouts
- * that read `user`/`status` (see app/(dashboard)/layout.tsx).
- */
+/** Client-side auth state: resolves the current user on mount; consumed via {@link useAuth}. */
 import * as React from "react";
 import * as auth from "@/services/user.service";
 import { ApiError } from "@/lib/api";
@@ -37,8 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(current);
       setStatus("authenticated");
     } catch (error) {
-      // 401 simply means "not logged in"; anything else we also treat as
-      // unauthenticated for gating, but leave to the caller/log for surfacing.
+      // 401 means "not logged in"; log anything else.
       if (!(error instanceof ApiError) || error.status !== 401) {
         console.error("Failed to resolve current user", error);
       }
@@ -47,8 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Resolve the session once on mount. State is only set after the await, and
-  // guarded so a fast unmount/re-mount can't apply a stale result.
+  // Resolve the session once on mount; guarded against a stale result.
   React.useEffect(() => {
     let active = true;
     (async () => {

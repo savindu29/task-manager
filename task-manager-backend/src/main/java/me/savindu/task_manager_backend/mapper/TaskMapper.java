@@ -8,11 +8,7 @@ import me.savindu.task_manager_backend.model.TaskStatus;
 import me.savindu.task_manager_backend.model.User;
 import org.springframework.stereotype.Component;
 
-/**
- * Maps between task requests, the {@link Task} entity and {@link TaskResponse}.
- * Pure mapping only: the owner and the resolved {@link TaskStatus} reference are
- * supplied by the service layer.
- */
+/** Maps task requests to/from the Task entity; owner and resolved status supplied by the service. */
 @Component
 public class TaskMapper {
 
@@ -26,10 +22,7 @@ public class TaskMapper {
                 .build();
     }
 
-    /**
-     * Applies a full-replace update onto a managed {@link Task}. The resolved
-     * status reference is supplied by the caller. Ownership is never changed.
-     */
+    /** Full-replace update onto a managed Task; ownership never changes. */
     public void applyUpdate(Task task, UpdateTaskRequest request, TaskStatus status) {
         task.setTitle(request.title().trim());
         task.setDescription(request.description());
